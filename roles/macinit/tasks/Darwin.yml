@@ -1,0 +1,10 @@
+---
+- name: Install & Upgrade Packages
+  include_tasks: packages.yml
+
+- name: Copy dotfiles & clone Git repos
+  include_tasks: dotfiles.yml
+  when: do_customize
+
+- name: Cleanup
+  include_tasks: cleanup.yml  

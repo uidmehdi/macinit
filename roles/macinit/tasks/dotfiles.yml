@@ -1,0 +1,53 @@
+---
+- name: clone vim plugins for autoload
+  git:
+    dest: "{{ vim_plugins_dir }}/start/{{ item.name }}"
+    repo: "{{ item.url }}"
+    clone: yes
+    update: yes
+    recursive: no
+  loop:
+  - name: nerdtree
+    url: https://github.com/preservim/nerdtree
+  - name: fzf-vim
+    url: https://github.com/junegunn/fzf.vim
+  - name: vim-fugitive
+    url: https://github.com/tpope/vim-fugitive
+  become: no
+
+- name: clone vim colors for autoload
+  git:
+    dest: "{{ vim_colors_dir }}/start/{{ item.name }}"
+    repo: "{{ item.url }}"
+    clone: yes
+    update: yes
+    recursive: no
+  loop:
+  - name: vim-wombat-scheme
+    url: https://github.com/sheerun/vim-wombat-scheme
+  - name: gruvbox
+    url: https://github.com/morhetz/gruvbox
+  become: no  
+
+- name: clone Gregory Pakosz's .tmux
+  git:
+    dest: "~/.tmux"
+    repo: https://github.com/gpakosz/.tmux.git
+    clone: yes
+    update: yes
+    recursive: no
+  become: no   
+
+- name: copying dotfiles
+  copy:
+    src: dotfiles/
+    dest: "~"
+    backup: yes
+    mode: 0640
+
+- name: symlinking .tmux
+  file:
+    src: "~/.tmux/.tmux.conf"
+    dest: "~/.tmux.conf"
+    force: yes
+    state: link

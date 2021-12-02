@@ -1,0 +1,18 @@
+[user]
+	name = Mehdi Hassanpour
+	email = h.mehdi@gmail.com
+
+[includeIf "gitdir:~/Projects/cadooz/"]
+	path = ~/.gitconfig_cadooz
+
+[core]
+	editor = vim
+	excludesfile = ~/.gitignore_global
+[color]
+	ui = true
+[pull]
+	ff = only
+[alias]
+        amp = "!f() { git add -A && git commit -m \"$@\" && git push; }; f"
+[init]
+	defaultBranch = main

@@ -1,0 +1,100 @@
+---
+- name: Initialize Macbook
+  hosts: all
+    
+  roles:
+    - role: macinit
+      vars: 
+        homebrew_tap:
+          - buo/cask-upgrade
+          - esolitos/ipa
+          - fluxcd/tap
+          - homebrew/bundle
+          - homebrew/cask
+          - homebrew/cask-fonts
+          - homebrew/cask-versions
+          - homebrew/core
+          - romkatv/powerlevel10k
+          - warrensbox/tap
+
+        homebrew:
+          - powerlevel10k
+          - ansible
+          - azure-cli
+          - base64
+          - bitwarden-cli
+          - dos2unix
+          - ffmpeg
+          - fzf
+          - git
+          - gnupg
+          - go
+          - helm
+          - htop
+          - jq
+          - kubernetes-cli
+          - kubectx
+          - neofetch
+          - tree
+          - pass
+          - pipx
+          - rclone
+          - reattach-to-user-namespace
+          - rsync
+          - ssh-copy-id
+          - stormssh
+          - stormssh-completion
+          # - terraform
+          - terraform-ls
+          - tmux
+          - vim
+          - watch
+          - wget
+          - youtube-dl
+          - yq
+          - zsh
+          - zsh-completions
+          - fluxcd/tap/flux
+          - esolitos/ipa/sshpass
+          - romkatv/powerlevel10k/powerlevel10k
+          - warrensbox/tap/tfswitch
+
+        homebrew_cask:
+          - adoptopenjdk
+          - alt-tab
+          - anki
+          - bitwarden
+          - dbeaver-community
+          - docker
+          - drawio
+          # - dropbox
+          - firefox
+          - font-blex-mono-nerd-font
+          - gitkraken
+          - google-drive
+          - handbrake
+          - iterm2
+          - itsycal
+          - lastpass
+          - licecap
+          - macpass
+          - microsoft-auto-update
+          - microsoft-edge
+          # - microsoft-teams
+          - mysqlworkbench
+          - rectangle
+          - spotify
+          - sublime-text
+          - telegram
+          - the-unarchiver
+          - tor-browser
+          - vagrant
+          # - virtualbox
+          # - virtualbox-extension-pack
+          - visual-studio-code
+          - vlc
+          - whatsapp
+
+        pip_packages:
+          - az-account-switcher 
+          - mkdocs 

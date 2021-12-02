@@ -1,0 +1,12 @@
+---
+brew_bin_path: /usr/local/bin
+homebrew_tap: []
+homebrew: []
+homebrew_cask: []
+pip_packages: []
+pip: no
+pipx: yes
+pipx_packages_bin_dir: ~/.local/bin
+do_customize: yes
+vim_colors_dir: ~/.vim/pack/colors
+vim_plugins_dir: ~/.vim/pack/plugins

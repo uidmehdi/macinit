@@ -1,0 +1,67 @@
+---
+- name: tapping homebrew repos
+  homebrew_tap:
+    name: "{{ homebrew_tap }}"
+    state: present
+
+- name: install brew packages
+  homebrew:
+    name: "{{ homebrew }}"
+    state: present
+    update_homebrew: yes
+  register: install
+  until: install is successful    
+
+- name: Update homebrew and upgrade all packages
+  homebrew:
+    update_homebrew: yes
+    upgrade_all: yes
+    upgrade_options: ignore-pinned
+
+- name: install brew cask packages
+  homebrew_cask:
+    name: "{{ homebrew_cask }}"
+    state: present
+    update_homebrew: yes
+  register: install
+  until: install is successful    
+
+- name: upgrading all casks
+  homebrew_cask:
+    upgrade_all: true  
+  register: upgrade
+  until: upgrade is successful
+
+- name: install pip packages.
+  pip:
+    name: "{{ pip_packages }}"
+    state: present
+    executable: "{{ pip.executable | default(omit) }}"
+  when: pip
+
+- name: Check if pipx is installed
+  stat: 
+    path: /usr/local/bin/pipx
+  register: pipx_bin
+  check_mode: no
+
+- name: Install & Upgrade pip packages
+  block:
+    - name: check if pip packages already installed
+      stat: 
+        path: "{{ pipx_packages_bin_dir }}/{{ item }}"
+      with_items: "{{ pip_packages }}"
+      register: pipx_packages_bin
+      check_mode: no
+
+    - name: install pip packages using pipx
+      command: /usr/local/bin/pipx install {{ item.item }}
+      with_items: "{{ pipx_packages_bin.results }}"
+      when: not item.stat.exists
+
+    - name: upgrade pip packages installed using pipx
+      command: /usr/local/bin/pipx upgrade-all
+  when: 
+    - pipx
+    - pipx_bin.stat.exists
+
