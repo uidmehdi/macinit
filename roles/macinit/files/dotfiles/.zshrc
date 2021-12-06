@@ -77,7 +77,7 @@ source $HOME/.aliases
 
 # User configuration
 
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/.local/bin:$HOME/bin"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 

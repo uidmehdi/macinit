@@ -20,6 +20,7 @@
         homebrew:
           - powerlevel10k
           - ansible
+          - ansible-lint
           - azure-cli
           - base64
           - bitwarden-cli
