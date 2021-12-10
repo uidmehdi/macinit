@@ -48,7 +48,7 @@
           # - terraform
           - terraform-ls
           - tmux
-          - vim
+          - { name: vim, install_options: override-system-vi }
           - watch
           - wget
           - youtube-dl
@@ -68,10 +68,11 @@
           - dbeaver-community
           - docker
           - drawio
-          # - dropbox
+          - dropbox
           - firefox
           - font-blex-mono-nerd-font
           - gitkraken
+          - google-chrome
           - google-drive
           - handbrake
           - iterm2
@@ -81,7 +82,8 @@
           - macpass
           - microsoft-auto-update
           - microsoft-edge
-          # - microsoft-teams
+          - microsoft-office
+          - microsoft-teams
           - mysqlworkbench
           - rectangle
           - spotify
@@ -90,8 +92,8 @@
           - the-unarchiver
           - tor-browser
           - vagrant
-          # - virtualbox
-          # - virtualbox-extension-pack
+          - virtualbox
+          - virtualbox-extension-pack
           - visual-studio-code
           - vlc
           - whatsapp

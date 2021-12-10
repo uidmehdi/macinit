@@ -5,13 +5,19 @@
     state: present
 
 - name: install brew packages
-  homebrew:
-    name: "{{ homebrew }}"
-    state: present
-    update_homebrew: yes
-  register: install
-  until: install is successful    
-
+  block:
+    - name: install brew packages
+      homebrew:
+        name: "{{ item.name | default(item) }}"
+        state: present
+        install_options: "{{ item.install_options | default() }}"
+        update_homebrew: yes
+      with_items: "{{ homebrew }}"
+  rescue: 
+    - name: print when failed
+      debug: 
+        msg: Some packages where not installed successfully!
+  
 - name: Update homebrew and upgrade all packages
   homebrew:
     update_homebrew: yes
@@ -19,12 +25,18 @@
     upgrade_options: ignore-pinned
 
 - name: install brew cask packages
-  homebrew_cask:
-    name: "{{ homebrew_cask }}"
-    state: present
-    update_homebrew: yes
-  register: install
-  until: install is successful    
+  block:
+    - name: install brew cask packages
+      homebrew_cask:
+        name: "{{ item.name | default(item) }}"
+        state: present
+        install_options: "{{ item.install_options | default() }}"
+        update_homebrew: yes
+      with_items: "{{ homebrew_cask }}"
+  rescue: 
+    - name: print when failed
+      debug: 
+        msg: Some packages where not installed successfully!
 
 - name: upgrading all casks
   homebrew_cask:
@@ -64,4 +76,3 @@
   when: 
     - pipx
     - pipx_bin.stat.exists
-
