@@ -2,7 +2,7 @@
 - name: remove stale lock files and outdated downloads for all formulae and casks
   command: "{{ brew_bin_path }}/brew cleanup"
   register: cleanup
-  until: install is successful  
+  until: cleanup is successful  
 
 - name: check your system for potential problems  
   command: "{{ brew_bin_path }}/brew doctor"
