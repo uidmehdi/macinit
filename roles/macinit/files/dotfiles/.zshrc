@@ -77,7 +77,7 @@ source $HOME/.aliases
 
 # User configuration
 
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/.local/bin:$HOME/bin"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/bin"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -116,7 +116,13 @@ export HOMEBREW_CASK_OPTS='--no-quarantine'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+if [[ $(uname -p) == 'arm' ]]; then
+  source /opt/homebrew/Cellar/powerlevel10k/1.15.0/powerlevel10k.zsh-theme
+else
+  source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+fi
+#source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+#source /opt/homebrew/Cellar/powerlevel10k/1.15.0/powerlevel10k.zsh-theme
 
 # Highlight the current autocomplete option
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
