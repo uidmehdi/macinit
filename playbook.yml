@@ -33,6 +33,7 @@
           - helm
           - htop
           - jq
+          - yq
           - kubernetes-cli
           - kubectx
           - neofetch
@@ -48,7 +49,7 @@
           # - terraform
           - terraform-ls
           - tmux
-          - { name: vim, install_options: override-system-vi }
+          - vim
           - watch
           - wget
           - youtube-dl
@@ -91,9 +92,9 @@
           - telegram
           - the-unarchiver
           - tor-browser
-          - vagrant
-          - virtualbox
-          - virtualbox-extension-pack
+          # - vagrant
+          # - virtualbox
+          # - virtualbox-extension-pack
           - visual-studio-code
           - vlc
           - whatsapp
