@@ -18,7 +18,6 @@
           - warrensbox/tap
 
         homebrew:
-          - powerlevel10k
           - ansible
           - ansible-lint
           - azure-cli
@@ -40,6 +39,8 @@
           - tree
           - pass
           - pipx
+          - powerlevel10k
+          - pre-commit
           - rclone
           - reattach-to-user-namespace
           - rsync
