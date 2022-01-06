@@ -48,6 +48,8 @@
           - stormssh-completion
           # - terraform
           - terraform-ls
+          - terraform-docs
+          - tflint
           - tmux
           - vim
           - watch
@@ -85,7 +87,7 @@
           - microsoft-edge
           - microsoft-office
           - microsoft-teams
-          - mysqlworkbench
+          # - mysqlworkbench
           - rectangle
           - spotify
           - sublime-text

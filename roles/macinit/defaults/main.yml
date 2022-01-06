@@ -1,5 +1,6 @@
 ---
-brew_bin_path: /usr/local/bin
+brew_prefix: "{{ (ansible_machine == 'arm64') | ternary('/opt/homebrew', '/usr/local') }}"
+brew_bin_path: "{{ brew_prefix }}/bin"
 homebrew_tap: []
 homebrew: []
 homebrew_cask: []
