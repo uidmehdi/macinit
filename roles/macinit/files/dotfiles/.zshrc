@@ -70,7 +70,7 @@ ZSH_TMUX_AUTOCONNECT='false' # do not autoconnect to existing tmux session, allo
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git history tmux kubectl kube-ps1 brew)
+plugins=(git history tmux kubectl kube-ps1 brew docker)
 
 source $ZSH/oh-my-zsh.sh
 source $HOME/.aliases
@@ -117,7 +117,7 @@ export HOMEBREW_CASK_OPTS='--no-quarantine'
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 if [[ $(uname -p) == 'arm' ]]; then
-  source /opt/homebrew/Cellar/powerlevel10k/1.15.0/powerlevel10k.zsh-theme
+  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
 else
   source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 fi
