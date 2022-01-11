@@ -51,6 +51,7 @@
           - terraform-ls
           - terraform-docs
           - tflint
+          - tfsec
           - tmux
           - vim
           - watch
