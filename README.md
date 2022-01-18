@@ -17,6 +17,10 @@ An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolse
 
      2. Install Ansible using pip. Follow the [installation instruction](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-macos)
 
+  3. Install Rosetta 2, in case you've got a new Apple Silicon (M1) Mac with following command.
+  
+  `sudo softwareupdate --install-rosetta --agree-to-license`
+
 ## Instalation
 
 Run the ansible playbook.

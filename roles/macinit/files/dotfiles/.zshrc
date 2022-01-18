@@ -89,7 +89,7 @@ export LC_ALL=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='mvim'
+  export EDITOR='vim'
 fi
 
 # Compilation flags
@@ -144,3 +144,5 @@ autoload -Uz compinit && compinit -i
 # Auto compelete flux
 command -v flux >/dev/null && . <(flux completion zsh) && compdef _flux flux
 
+# Stern autocompletion
+source <(stern --completion=zsh)
