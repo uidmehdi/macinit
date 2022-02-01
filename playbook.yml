@@ -18,6 +18,7 @@
           - warrensbox/tap
 
         homebrew:
+          - age
           - ansible
           - ansible-lint
           - azure-cli
@@ -44,6 +45,7 @@
           - rclone
           - reattach-to-user-namespace
           - rsync
+          - sops
           - ssh-copy-id
           - stern
           - stormssh
@@ -83,7 +85,6 @@
           - handbrake
           - iterm2
           - itsycal
-          - lastpass
           - licecap
           - macpass
           - microsoft-auto-update
@@ -92,6 +93,7 @@
           - microsoft-teams
           - monitorcontrol
           # - mysqlworkbench
+          - postman
           - rectangle
           - spotify
           - sublime-text

@@ -86,11 +86,11 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='vim'
-fi
+#if [[ -n $SSH_CONNECTION ]]; then
+#  export EDITOR='vim'
+#else
+#  export EDITOR='mvim'
+#fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -121,8 +121,6 @@ if [[ $(uname -p) == 'arm' ]]; then
 else
   source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 fi
-#source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
-#source /opt/homebrew/Cellar/powerlevel10k/1.15.0/powerlevel10k.zsh-theme
 
 # Highlight the current autocomplete option
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
