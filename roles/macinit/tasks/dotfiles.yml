@@ -13,6 +13,8 @@
     url: https://github.com/junegunn/fzf.vim
   - name: vim-fugitive
     url: https://github.com/tpope/vim-fugitive
+  - name: vim-markdown
+    url: https://github.com/preservim/vim-markdown
   - name: vim-terraform
     url: https://github.com/hashivim/vim-terraform
   become: no
