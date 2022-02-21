@@ -32,6 +32,7 @@
           - go
           - helm
           - htop
+          - istioctl
           - jq
           - yq
           - kubernetes-cli
@@ -72,6 +73,7 @@
           - adoptopenjdk
           - alt-tab
           - anki
+          - brave-browser
           - bitwarden
           - dbeaver-community
           - docker
@@ -83,6 +85,7 @@
           - google-chrome
           - google-drive
           - handbrake
+          - intellij-idea-ce
           - iterm2
           - itsycal
           - licecap
