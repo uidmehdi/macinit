@@ -71,8 +71,9 @@
       with_items: "{{ pipx_packages_bin.results }}"
       when: not item.stat.exists
 
-        #    - name: upgrade pip packages installed using pipx
-        #      command: "{{ brew_bin_path }}/pipx upgrade-all" 
+    - name: upgrade pip packages installed using pipx
+      command: "{{ brew_bin_path }}/pipx upgrade-all" 
+
   when: 
     - pipx
     - pipx_bin.stat.exists
