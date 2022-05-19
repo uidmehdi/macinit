@@ -11,3 +11,4 @@ pipx_packages_bin_dir: ~/.local/bin
 do_customize: yes
 vim_colors_dir: ~/.vim/pack/colors
 vim_plugins_dir: ~/.vim/pack/plugins
+omz_plugins_dir: ~/.oh-my-zsh/custom/plugins

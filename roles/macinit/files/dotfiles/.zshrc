@@ -70,7 +70,7 @@ ZSH_TMUX_AUTOCONNECT='false' # do not autoconnect to existing tmux session, allo
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git history tmux kubectl kube-ps1 brew docker)
+plugins=(git history tmux zsh-autosuggestions kubectl kube-ps1 brew docker multipass)
 
 source $ZSH/oh-my-zsh.sh
 source $HOME/.aliases
@@ -136,6 +136,13 @@ zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower
 
 # Initialize the autocompletion
 autoload -Uz compinit && compinit -i
+
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+  autoload -Uz compinit
+  compinit
+fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

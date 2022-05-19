@@ -42,6 +42,18 @@
     recursive: no
   become: no   
 
+- name: clone zsh custom plugins
+  git:
+    dest: "{{ omz_plugins_dir }}/{{ item.name }}"
+    repo: "{{ item.url }}"
+    clone: yes
+    update: yes
+    recursive: no
+  loop:
+  - name: zsh-autosuggestions
+    url: https://github.com/zsh-users/zsh-autosuggestions
+  become: no
+
 - name: copying dotfiles
   copy:
     src: dotfiles/
