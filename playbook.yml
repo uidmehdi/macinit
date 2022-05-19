@@ -34,7 +34,7 @@
           - htop
           - istioctl
           - jq
-          - yq
+          - kind
           - kubernetes-cli
           - kubectx
           - neofetch
@@ -90,6 +90,7 @@
           - itsycal
           - licecap
           - macpass
+          - multipass
           - microsoft-auto-update
           - microsoft-edge
           - microsoft-office
