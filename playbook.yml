@@ -37,6 +37,7 @@
           - kind
           - kubernetes-cli
           - kubectx
+          - minikube
           - neofetch
           - tree
           - pass
