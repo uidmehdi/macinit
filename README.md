@@ -23,11 +23,12 @@ An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolse
 
 ## Instalation
 
+Install oh-my-zsh
+`sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
+
 Run the ansible playbook.
 `ansible-playbook -i inventory playbook.yml`
 
-Install oh-my-zsh
-`sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
 
 ## Troubleshooting
 
