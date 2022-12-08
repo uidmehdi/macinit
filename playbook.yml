@@ -21,6 +21,7 @@
           - age
           - ansible
           - ansible-lint
+          - azcopy
           - azure-cli
           - base64
           - bat
@@ -38,6 +39,7 @@
           - kind
           - kubernetes-cli
           - kubectx
+          - kustomize
           - minikube
           - neofetch
           - tree
