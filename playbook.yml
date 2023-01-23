@@ -26,6 +26,7 @@
           - base64
           - bat
           - bitwarden-cli
+          - derailed/k9s/k9s
           - dos2unix
           - ffmpeg
           - fzf
@@ -53,8 +54,6 @@
           - sops
           - ssh-copy-id
           - stern
-          - stormssh
-          - stormssh-completion
           # - terraform
           - terraform-ls
           - terraform-docs
