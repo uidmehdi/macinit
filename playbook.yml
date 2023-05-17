@@ -5,19 +5,18 @@
   roles:
     - role: macinit
       vars: 
+        do_customize: no
         homebrew_tap:
           - buo/cask-upgrade
-          - esolitos/ipa
           - fluxcd/tap
           - homebrew/bundle
-          - homebrew/cask
           - homebrew/cask-fonts
           - homebrew/cask-versions
-          - homebrew/core
           - romkatv/powerlevel10k
           - warrensbox/tap
 
         homebrew:
+          - Azure/kubelogin/kubelogin
           - age
           - ansible
           - ansible-lint
@@ -28,7 +27,9 @@
           - bitwarden-cli
           - derailed/k9s/k9s
           - dos2unix
+          - esolitos/ipa/sshpass
           - ffmpeg
+          - fluxcd/tap/flux
           - fzf
           - git
           - gnupg
@@ -38,46 +39,45 @@
           - istioctl
           - jq
           - kind
-          - kubernetes-cli
           - kubectx
+          - kubernetes-cli
           - kustomize
+          - libpq
           - minikube
           - neofetch
-          - tree
           - pass
           - pipx
           - powerlevel10k
           - pre-commit
           - rclone
           - reattach-to-user-namespace
+          - romkatv/powerlevel10k/powerlevel10k
           - rsync
           - sops
           - ssh-copy-id
           - stern
           # - terraform
-          - terraform-ls
           - terraform-docs
+          - terraform-ls
           - tflint
           - tfsec
           - tmux
+          - tree
           - vim
+          - warrensbox/tap/tfswitch
           - watch
           - wget
           - youtube-dl
           - yq
           - zsh
           - zsh-completions
-          - fluxcd/tap/flux
-          - esolitos/ipa/sshpass
-          - romkatv/powerlevel10k/powerlevel10k
-          - warrensbox/tap/tfswitch
 
         homebrew_cask:
           - adoptopenjdk
           - alt-tab
           - anki
-          - brave-browser
           - bitwarden
+          - brave-browser
           - dbeaver-community
           - docker
           - drawio
@@ -93,12 +93,12 @@
           - itsycal
           - licecap
           - macpass
-          - multipass
           - microsoft-auto-update
           - microsoft-edge
           - microsoft-office
           - microsoft-teams
           - monitorcontrol
+          - multipass
           # - mysqlworkbench
           - postman
           - rectangle
