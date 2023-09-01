@@ -32,6 +32,7 @@
           - fluxcd/tap/flux
           - fzf
           - git
+          - gist
           - gnupg
           - go
           - helm
@@ -45,6 +46,7 @@
           - libpq
           - minikube
           - neofetch
+          - orbstack
           - pass
           - pipx
           - powerlevel10k

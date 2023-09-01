@@ -7,8 +7,10 @@ An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolse
 
   1. Install Homebrew using the following command or follow the instructions on [Homebrew's official website](https://brew.sh/).
 
-     1. Run the following command`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-
+     1. Run the following command
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 > Note: Homebrew will install Apple's command line tool as part of the installation. To check this, after successful installation, run `xcode-select -p` or install again `xcode-select --install`.
 
   2. Install Ansible using Homebrew or pip.
@@ -19,16 +21,45 @@ An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolse
 
   3. Install Rosetta 2, in case you've got a new Apple Silicon (M1) Mac with following command.
   
-  `sudo softwareupdate --install-rosetta --agree-to-license`
+```
+sudo softwareupdate --install-rosetta --agree-to-license
+```
 
 ## Instalation
 
 Install oh-my-zsh
-`sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
+```
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
 
 Run the ansible playbook.
-`ansible-playbook -i inventory playbook.yml`
 
+```
+ansible-playbook -i inventory playbook.yml
+```
+## zsh-completions
+
+To activate these completions, add the following to your .zshrc:
+
+```  
+  if type brew &>/dev/null; then
+    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+    autoload -Uz compinit
+    compinit
+  fi
+```
+You may also need to force rebuild `zcompdump`:
+
+```  
+rm -f ~/.zcompdump; compinit
+```
+Additionally, if you receive "zsh compinit: insecure directories" warnings when attempting
+to load these completions, you may need to run this:
+
+```  
+chmod -R go-w '/opt/homebrew/share/zsh'
+```
 
 ## Troubleshooting
 
