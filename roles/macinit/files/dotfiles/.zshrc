@@ -77,7 +77,8 @@ source $HOME/.aliases
 
 # User configuration
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/homebrew/opt/libpq/bin:$HOME/.local/bin:$HOME/bin"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/ssh-copy-id/bin:$HOME/.local/bin:$HOME/bin:$PATH"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -117,7 +118,7 @@ export HOMEBREW_CASK_OPTS='--no-quarantine'
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 if [[ $(uname -p) == 'arm' ]]; then
-  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+  source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 else
   source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 fi
@@ -137,6 +138,7 @@ zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower
 # Docker autocompletion
 zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:docker-*:*' option-stacking yes
+#zstyle ':omz:plugins:docker' legacy-completion yes
 
 # Initialize the autocompletion
 autoload -Uz compinit && compinit -i
@@ -155,3 +157,15 @@ command -v flux >/dev/null && . <(flux completion zsh) && compdef _flux flux
 
 # Stern autocompletion
 source <(stern --completion=zsh)
+
+# kubectl krew
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+
+# pnpm
+export PNPM_HOME="/Users/mehdi/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

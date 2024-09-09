@@ -24,7 +24,9 @@
           - azure-cli
           - base64
           - bat
+          - betterdisplay
           - bitwarden-cli
+          - curl
           - derailed/k9s/k9s
           - dos2unix
           - esolitos/ipa/sshpass
@@ -32,6 +34,7 @@
           - fluxcd/tap/flux
           - fzf
           - git
+          - gitleaks
           - gist
           - gnupg
           - go
@@ -42,10 +45,12 @@
           - kind
           - kubectx
           - kubernetes-cli
+          - krew
           - kustomize
           - libpq
           - minikube
           - neofetch
+          - nordvpn
           - orbstack
           - pass
           - pipx
@@ -57,6 +62,7 @@
           - rsync
           - sops
           - ssh-copy-id
+          - sshuttle
           - stern
           # - terraform
           - terraform-docs
@@ -69,13 +75,12 @@
           - warrensbox/tap/tfswitch
           - watch
           - wget
-          - youtube-dl
+          - yt-dlp
           - yq
           - zsh
           - zsh-completions
 
         homebrew_cask:
-          - adoptopenjdk
           - alt-tab
           - anki
           - bitwarden
@@ -105,8 +110,10 @@
           - postman
           - rectangle
           - spotify
+          - slack
           - sublime-text
           - telegram
+          - temurin
           - the-unarchiver
           - tor-browser
           # - vagrant

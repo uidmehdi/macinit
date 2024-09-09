@@ -1381,6 +1381,8 @@
 			<false/>
 			<key>Normal Font</key>
 			<string>BlexMonoNF 13</string>
+			<key>Open Password Manager Automatically</key>
+			<true/>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Prompt Before Closing 2</key>
@@ -1425,6 +1427,8 @@
 			<string></string>
 			<key>Show Mark Indicators</key>
 			<false/>
+			<key>Show Status Bar</key>
+			<false/>
 			<key>Silence Bell</key>
 			<true/>
 			<key>Sync Title</key>
@@ -1437,6 +1441,8 @@
 			<integer>1</integer>
 			<key>Transparency</key>
 			<real>0.0</real>
+			<key>Triggers</key>
+			<array/>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>

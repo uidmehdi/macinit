@@ -32,11 +32,16 @@ Install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-Run the ansible playbook.
+Run the ansible playbook without customization keeping your existing dotfiles un-changed:
+```
+ansible-playbook -i inventory playbook.yml -e "do_customize=no"
+```
 
+OR, if you want all customizations and existing dotfiles to be overriten: (there will be a backup of the changed file in the same folder)
 ```
 ansible-playbook -i inventory playbook.yml
 ```
+
 ## zsh-completions
 
 To activate these completions, add the following to your .zshrc:
