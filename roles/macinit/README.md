@@ -1,47 +1,95 @@
-Bootstrap macOS with Ansible
-=========
+macinit
+=======
 
-An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolsets.
+Ansible role to bootstrap macOS (Apple Silicon) with Homebrew packages, casks, uv-managed Python tools, and dotfiles for a DevOps/SRE workstation.
 
 Requirements
 ------------
 
-Install Homebrew using the following command or follow the instructions on [Homebrew's official website](https://brew.sh/).
-
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-
-> Note: Homebrew will install Apple's command line tool as part of the installation. To check this, after successful installation, run `xcode-select -p` or install again `xcode-select --install`.
-
+- macOS on Apple Silicon (M-series)
+- `community.general` collection (`ansible-galaxy collection install -r requirements.yml`)
+- Xcode Command Line Tools (`xcode-select --install`)
 
 Role Variables
 --------------
 
-Settable variables for this role should be found in defaults/main.yml, and all packages to be installed are set in vars/main.yml.
+All variables have defaults in `defaults/main.yml`. Package lists are defined in `group_vars/all/vars.yml` at the playbook level.
 
+| Variable | Default | Description |
+|---|---|---|
+| `brew_prefix` | `/opt/homebrew` | Homebrew prefix path |
+| `brew_bin_path` | `{{ brew_prefix }}/bin` | Homebrew bin directory |
+| `homebrew_tap` | `[]` | List of taps to add |
+| `homebrew` | `[]` | List of formulae to install (packages not in this list are removed) |
+| `homebrew_cask` | `[]` | List of casks to install (casks not in this list are removed) |
+| `homebrew_upgrade_all` | `true` | Upgrade all formulae and casks on each run. Set to `false` to skip upgrades. |
+| `uv_tools` | `[]` | Python CLI tools to install via `uv tool install --upgrade` |
+| `do_customize` | `true` | Copy dotfiles and clone Git repos |
+| `vim_plugins_dir` | `~/.vim/pack/plugins` | Vim plugins directory |
+| `vim_colors_dir` | `~/.vim/pack/colors` | Vim color schemes directory |
+| `omz_plugins_dir` | `~/.oh-my-zsh/custom/plugins` | Oh My Zsh custom plugins directory |
+| `vim_plugins` | see defaults | List of `{name, url}` Vim plugins to clone |
+| `vim_color_schemes` | see defaults | List of `{name, url}` Vim color schemes to clone |
+| `tmux_repo` | gpakosz/.tmux | tmux config repo URL |
+| `zsh_plugins` | see defaults | List of `{name, url}` Oh My Zsh plugins to clone |
+
+Tasks
+-----
+
+| Task file | Description |
+|---|---|
+| `main.yml` | Entry point; fails on non-macOS platforms |
+| `Darwin.yml` | Orchestrates homebrew → packages → dotfiles → cleanup |
+| `homebrew.yml` | Installs Homebrew if not already present |
+| `packages.yml` | Taps, formulae, casks, uv tool installs and upgrades; removes packages not in the desired list |
+| `dotfiles.yml` | Configures passwordless sudo, installs oh-my-zsh, clones Vim plugins/colors, tmux and zsh plugins, copies dotfiles |
+| `cleanup.yml` | `brew autoremove`, `brew cleanup`, and `brew doctor` |
+
+Dotfiles managed
+----------------
+
+| File | Description |
+|---|---|
+| `.zshrc` | Zsh configuration (Oh My Zsh + Powerlevel10k) |
+| `.zshenv` | Environment variables; sources `.zshenv.local` for machine-specific overrides |
+| `.aliases` | Shell aliases; sources `.aliases.local` for machine-specific aliases |
+| `.p10k.zsh` | Powerlevel10k prompt configuration |
+| `.vimrc` | Vim configuration |
+| `.fzf.zsh` | fzf shell integration (zsh) |
+| `.fzf.bash` | fzf shell integration (bash) |
+| `.tmux.conf.local` | tmux local overrides for gpakosz/.tmux |
+| `.iTerm2/` | iTerm2 dynamic profile |
 
 Example Playbook
 ----------------
 
 ```yaml
-- hosts: localhost
+- hosts: all
   roles:
-    - macinit
-  vars:
-    homebrew:
-      - ansible
-      - git
-      - pipx
-    homebrew_cask:
-      - docker
-      - visual-studio-code
+    - role: macinit
+```
+
+Override package lists inline (or via `group_vars`):
+
+```yaml
+- hosts: all
+  roles:
+    - role: macinit
+      vars:
+        do_customize: false
+        homebrew:
+          - git
+          - vim
+        homebrew_cask:
+          - visual-studio-code
 ```
 
 License
 -------
 
-BSD
+MIT
 
-Author Information
-------------------
+Author
+------
 
 Mehdi Hassanpour

@@ -1,79 +1,113 @@
 ---
-- name: tapping homebrew repos
-  homebrew_tap:
+- name: Update Homebrew
+  community.general.homebrew:
+    update_homebrew: true
+  tags: [packages, brew]
+
+- name: Add Homebrew taps
+  community.general.homebrew_tap:
     name: "{{ homebrew_tap }}"
     state: present
+  when: homebrew_tap | length > 0
+  tags: [packages, brew]
 
-- name: install brew packages
+- name: Install Homebrew formulae
   block:
-    - name: install brew packages
-      homebrew:
+    - name: Install formula
+      community.general.homebrew:
         name: "{{ item.name | default(item) }}"
         state: present
-        install_options: "{{ item.install_options | default() }}"
-        update_homebrew: yes
-      with_items: "{{ homebrew }}"
-  rescue: 
-    - name: print when failed
-      debug: 
-        msg: Some packages where not installed successfully!
-  
-- name: Update homebrew and upgrade all packages
-  homebrew:
-    update_homebrew: yes
-    upgrade_all: yes
-    upgrade_options: ignore-pinned
+        install_options: "{{ item.install_options | default(omit) }}"
+        update_homebrew: false
+      loop: "{{ homebrew }}"
+  rescue:
+    - name: Warn on failed formulae installs
+      ansible.builtin.debug:
+        msg: "Formula install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
+  when: homebrew | length > 0
+  tags: [packages, brew]
 
-- name: install brew cask packages
+- name: Resolve desired package names
+  ansible.builtin.set_fact:
+    desired_formulae: "{{ (homebrew | selectattr('name', 'defined') | map(attribute='name') | list)
+                        + (homebrew | select('string') | list) }}"
+    desired_casks: "{{ (homebrew_cask | selectattr('name', 'defined') | map(attribute='name') | list)
+                     + (homebrew_cask | select('string') | list) }}"
+  tags: [packages, brew, cask]
+
+- name: Get installed Homebrew formulae
+  ansible.builtin.command: "{{ brew_bin_path }}/brew leaves"
+  register: brew_leaves
+  changed_when: false
+  check_mode: false
+  tags: [packages, brew]
+
+- name: Remove formulae not in desired list
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ brew_leaves.stdout_lines }}"
+  when: homebrew | length > 0 and item not in desired_formulae
+  tags: [packages, brew]
+
+- name: Upgrade all Homebrew formulae
+  ansible.builtin.command: "{{ brew_bin_path }}/brew upgrade"
+  register: brew_upgrade
+  changed_when: brew_upgrade.stdout | length > 0
+  when: homebrew_upgrade_all | default(true)
+  tags: [packages, brew]
+
+- name: Install Homebrew cask packages
   block:
-    - name: install brew cask packages
-      homebrew_cask:
+    - name: Install cask
+      community.general.homebrew_cask:
         name: "{{ item.name | default(item) }}"
         state: present
-        install_options: "{{ item.install_options | default() }}"
-        update_homebrew: yes
-      with_items: "{{ homebrew_cask }}"
-  rescue: 
-    - name: print when failed
-      debug: 
-        msg: Some packages where not installed successfully!
+        install_options: "{{ item.install_options | default(omit) }}"
+        update_homebrew: false
+      loop: "{{ homebrew_cask }}"
+  rescue:
+    - name: Warn on failed cask installs
+      ansible.builtin.debug:
+        msg: "Cask install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
+  when: homebrew_cask | length > 0
+  tags: [packages, cask]
 
-- name: upgrading all casks
-  homebrew_cask:
-    upgrade_all: true  
-  register: upgrade
-  until: upgrade is successful
+- name: Get installed Homebrew casks
+  ansible.builtin.command: "{{ brew_bin_path }}/brew list --cask"
+  register: brew_casks_installed
+  changed_when: false
+  check_mode: false
+  tags: [packages, cask]
 
-- name: install pip packages.
-  pip:
-    name: "{{ pip_packages }}"
-    state: present
-    executable: "{{ pip.executable | default(omit) }}"
-  when: pip
+- name: Remove casks not in desired list
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ brew_casks_installed.stdout_lines }}"
+  when: homebrew_cask | length > 0 and item not in desired_casks
+  tags: [packages, cask]
 
-- name: Check if pipx is installed
-  stat: 
-    path: "{{ brew_bin_path }}/pipx"
-  register: pipx_bin
-  check_mode: no
-
-- name: Install & Upgrade pip packages
+- name: Upgrade all Homebrew casks
   block:
-    - name: check if pip packages already installed
-      stat: 
-        path: "{{ pipx_packages_bin_dir }}/{{ item }}"
-      with_items: "{{ pip_packages }}"
-      register: pipx_packages_bin
-      check_mode: no
+    - name: Upgrade casks
+      community.general.homebrew_cask:
+        upgrade_all: true
+  when: homebrew_upgrade_all | default(true)
+  rescue:
+    - name: Warn on failed cask upgrades
+      ansible.builtin.debug:
+        msg: >-
+          Cask upgrade failed: {{ ansible_failed_result.msg | default('unknown error') }}.
+          Casks requiring sudo (e.g. docker-desktop) may need manual: brew upgrade --cask
+  tags: [packages, cask]
 
-    - name: install pip packages using pipx
-      command: "{{ brew_bin_path }}/pipx install {{ item.item }}"
-      with_items: "{{ pipx_packages_bin.results }}"
-      when: not item.stat.exists
-
-    - name: upgrade pip packages installed using pipx
-      command: "{{ brew_bin_path }}/pipx upgrade-all" 
-
-  when: 
-    - pipx
-    - pipx_bin.stat.exists
+- name: Install or upgrade Python tools via uv
+  ansible.builtin.command: "{{ brew_bin_path }}/uv tool install --upgrade {{ item }}"
+  loop: "{{ uv_tools }}"
+  register: uv_tool_result
+  changed_when: >-
+    'Installed' in uv_tool_result.stdout or
+    'Updated' in uv_tool_result.stdout
+  when: uv_tools | length > 0
+  tags: [packages, uv]

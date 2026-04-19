@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  roles:
+    - role: macinit
+      vars:
+        do_customize: false
+        homebrew:
+          - git
+          - curl
+          - jq
+          - uv
+        homebrew_cask: []
+        uv_tools: []

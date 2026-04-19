@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: all
+  roles:
+    - role: macinit
+      vars:
+        do_customize: false
+        homebrew:
+          - git
+          - curl
+          - jq
+          - bat
+          - uv
+        homebrew_cask: []
+        uv_tools:
+          - az-account-switcher

@@ -74,4 +74,3 @@ set laststatus=2
 "set lazyredraw
 "map tt :NERDTreeToggle<CR> "double click t button to toggle NerdTree
 "map [] :TagbarToggle<CR> "click [] to toggle Tagbar
-

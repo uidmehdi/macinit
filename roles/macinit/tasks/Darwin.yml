@@ -1,10 +1,17 @@
 ---
-- name: Install & Upgrade Packages
-  include_tasks: packages.yml
+- name: Install Homebrew
+  ansible.builtin.include_tasks: homebrew.yml
+  tags: [brew]
 
-- name: Copy dotfiles & clone Git repos
-  include_tasks: dotfiles.yml
-  when: do_customize
+- name: Install and upgrade packages
+  ansible.builtin.include_tasks: packages.yml
+  tags: [packages]
 
-- name: Cleanup
-  include_tasks: cleanup.yml  
+- name: Copy dotfiles and clone Git repos
+  ansible.builtin.include_tasks: dotfiles.yml
+  when: do_customize | bool
+  tags: [dotfiles]
+
+- name: Run cleanup
+  ansible.builtin.include_tasks: cleanup.yml
+  tags: [cleanup]

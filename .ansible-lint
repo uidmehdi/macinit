@@ -1,0 +1,11 @@
+---
+warn_list:
+  - no-changed-when       # we use changed_when explicitly where needed
+  - experimental          # suppress experimental rule warnings
+
+skip_list:
+  - role-name             # local role, not publishing to Galaxy
+
+exclude_paths:
+  - .git/
+  - roles/macinit/files/

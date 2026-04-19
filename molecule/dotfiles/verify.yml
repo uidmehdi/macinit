@@ -1,0 +1,68 @@
+---
+- name: Verify dotfiles
+  hosts: all
+
+  tasks:
+    - name: Check oh-my-zsh is installed
+      ansible.builtin.stat:
+        path: "~/.oh-my-zsh"
+      register: omz_dir
+      failed_when: not omz_dir.stat.exists
+
+    - name: Check dotfiles are deployed
+      ansible.builtin.stat:
+        path: "~/.{{ item }}"
+      loop:
+        - zshrc
+        - aliases
+        - vimrc
+        - p10k.zsh
+        - fzf.zsh
+        - tmux.conf.local
+      register: dotfile_stat
+      failed_when: not dotfile_stat.stat.exists
+
+    - name: Check .tmux.conf symlink exists
+      ansible.builtin.stat:
+        path: ~/.tmux.conf
+      register: tmux_conf
+      failed_when: not tmux_conf.stat.exists or not tmux_conf.stat.islnk
+
+    - name: Check .tmux directory is cloned
+      ansible.builtin.stat:
+        path: ~/.tmux/.tmux.conf
+      register: tmux_repo
+      failed_when: not tmux_repo.stat.exists
+
+    - name: Check zsh-autosuggestions is cloned
+      ansible.builtin.stat:
+        path: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+      register: zsh_autosuggest
+      failed_when: not zsh_autosuggest.stat.exists
+
+    - name: Check autoupdate plugin is cloned
+      ansible.builtin.stat:
+        path: ~/.oh-my-zsh/custom/plugins/autoupdate
+      register: autoupdate_plugin
+      failed_when: not autoupdate_plugin.stat.exists
+
+    - name: Check Vim plugins are cloned
+      ansible.builtin.stat:
+        path: "~/.vim/pack/plugins/start/{{ item }}"
+      loop:
+        - nerdtree
+        - fzf-vim
+        - vim-fugitive
+        - vim-markdown
+        - vim-terraform
+      register: vim_plugin_stat
+      failed_when: not vim_plugin_stat.stat.exists
+
+    - name: Check Vim color schemes are cloned
+      ansible.builtin.stat:
+        path: "~/.vim/pack/colors/start/{{ item }}"
+      loop:
+        - gruvbox
+        - vim-wombat-scheme
+      register: vim_color_stat
+      failed_when: not vim_color_stat.stat.exists
