@@ -1,0 +1,16 @@
+---
+- name: Check if Homebrew is already installed
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew
+  register: brew_bin
+  check_mode: false
+  tags: [brew]
+
+- name: Install Homebrew
+  ansible.builtin.shell:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  environment:
+    NONINTERACTIVE: "1"
+  when: not brew_bin.stat.exists
+  changed_when: not brew_bin.stat.exists
+  tags: [brew]

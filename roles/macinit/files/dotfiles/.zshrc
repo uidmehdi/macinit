@@ -1,171 +1,163 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+# ──────────────────────────────────────────────────────────────────────────────
+# Instant prompt (must be very first)
+# ──────────────────────────────────────────────────────────────────────────────
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-GITSTATUS_LOG_LEVEL=DEBUG
-
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+# ──────────────────────────────────────────────────────────────────────────────
+# Basic environment
+# ──────────────────────────────────────────────────────────────────────────────
 export TERM=xterm-256color
-#source $ZSH/oh-my-zsh.sh
-
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-#ZSH_THEME="robbyrussell"
-#ZSH_THEME="agnoster"
-#ZSH_THEME="bira"
-#ZSH_THEME="blinks"
-#ZSH_THEME="clean"
-
-# zsh tmux settings
-#ZSH_TMUX_AUTOSTART='true'
-ZSH_TMUX_AUTOCONNECT='false' # do not autoconnect to existing tmux session, allows a new term new tmux session
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git history tmux zsh-autosuggestions kubectl kube-ps1 brew docker minikube multipass)
-
-source $ZSH/oh-my-zsh.sh
-source $HOME/.aliases
-
-# User configuration
-
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/ssh-copy-id/bin:$HOME/.local/bin:$HOME/bin:$PATH"
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# Preferred editor for local and remote sessions
-#if [[ -n $SSH_CONNECTION ]]; then
-#  export EDITOR='vim'
-#else
-#  export EDITOR='mvim'
-#fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-## Python
-#export WORKON_HOME=$HOME/.virtualenvs
-#source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-
-## Homebrew
 export HOMEBREW_CASK_OPTS='--no-quarantine'
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-if [[ $(uname -p) == 'arm' ]]; then
-  source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
-else
-  source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+# ──────────────────────────────────────────────────────────────────────────────
+# PATH (consolidated & Homebrew-first)
+# ──────────────────────────────────────────────────────────────────────────────
+typeset -U PATH path
+path=(
+  /opt/homebrew/bin
+  /opt/homebrew/sbin
+  "$HOME/.local/bin"
+  "$HOME/bin"
+  "$HOME/bin/scripts"
+  /usr/local/sbin
+  /usr/local/bin
+  /usr/sbin
+  /usr/bin
+  /sbin
+  /bin
+  $path
+  # Add more tool-specific paths only if needed
+)
+
+export PATH
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Oh My Zsh
+# ──────────────────────────────────────────────────────────────────────────────
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_TMUX_AUTOCONNECT='false'
+
+zstyle ':omz:update' mode auto
+zstyle ':omz:update' frequency 13
+
+plugins=(
+  git
+  history
+  tmux
+  zsh-autosuggestions
+  kubectl
+  kube-ps1
+  brew
+  docker
+  nvm
+  autoupdate
+)
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Load Oh My Zsh *before* heavy customizations
+# ──────────────────────────────────────────────────────────────────────────────
+source "$ZSH/oh-my-zsh.sh"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Powerlevel10k
+# ──────────────────────────────────────────────────────────────────────────────
+if [[ -d "$(brew --prefix)/share/powerlevel10k" ]]; then
+  source "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
 fi
 
-# Highlight the current autocomplete option
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Completions
+# ──────────────────────────────────────────────────────────────────────────────
+FPATH="$(brew --prefix)/share/zsh-completions:$FPATH"
+
+# Optional: external completions repo (more completions, but careful with startup)
+# fpath+="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-completions/src"
+
+autoload -Uz compinit
+compinit
+
+# Cache completions for better performance
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completion"
+
+# Color completion entries using LS_COLORS
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# Better SSH/Rsync/SCP Autocomplete
+# Prioritize hosts over files for scp/rsync
 zstyle ':completion:*:(scp|rsync):*' tag-order ' hosts:-ipaddr:ip\ address hosts:-host:host files'
+
+# Filter out localhost and broadcast hosts from ssh/scp/rsync completion
 zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host' ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
+
+# Filter out invalid and local IP addresses from ssh/scp/rsync completion
 zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
 
-# Allow for autocomplete to be case insensitive
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
-  '+l:|?=** r:|?=**'
+# Enable case-insensitive and fuzzy completion matching
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|?=** r:|?=**'
 
-# Docker autocompletion
+# Allow Docker option stacking (e.g., -it instead of -i -t)
 zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:docker-*:*' option-stacking yes
-#zstyle ':omz:plugins:docker' legacy-completion yes
 
-# Initialize the autocompletion
-autoload -Uz compinit && compinit -i
+# Enable interactive menu selection for completions
+zstyle ':completion:*' menu select
 
-if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+# Group completions by type with descriptive headers
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
 
-  autoload -Uz compinit
-  compinit
-fi
+# Highlight process IDs in red for kill command completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Tool completions loaded late (after compinit)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Auto compelete flux
-command -v flux >/dev/null && . <(flux completion zsh) && compdef _flux flux
+# Flux completion (only if installed)
+command -v flux >/dev/null && . <(flux completion zsh)
 
-# Stern autocompletion
-source <(stern --completion=zsh)
+# Stern completion (only if installed)
+command -v stern >/dev/null && source <(stern --completion=zsh)
 
 # kubectl krew
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-
 # pnpm
-export PNPM_HOME="/Users/mehdi/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+export PNPM_HOME="$HOME/Library/pnpm"
+path+="$PNPM_HOME"
+export PATH
+
+# NVM – lazy loading using oh-my-zsh plugin
+export NVM_DIR="$HOME/.nvm"
+zstyle ':omz:plugins:nvm' lazy yes
+
+# jenv
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# syntax highlighting (must come AFTER compinit & most plugins)
+# ──────────────────────────────────────────────────────────────────────────────
+# Install with: brew install zsh-syntax-highlighting
+if [[ -r "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+# Custom aliases last
+source ~/.aliases
+
+# Local overrides last (e.g., CIDR variable for ssh completion)
+CIDR="10.110.0.0/16 10.100.0.0/16 10.200.0.0/16"
+
+#eval "$(direnv hook zsh)"

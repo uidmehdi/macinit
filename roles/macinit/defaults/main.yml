@@ -1,14 +1,37 @@
 ---
-brew_prefix: "{{ (ansible_machine == 'arm64') | ternary('/opt/homebrew', '/usr/local') }}"
+brew_prefix: /opt/homebrew
 brew_bin_path: "{{ brew_prefix }}/bin"
 homebrew_tap: []
 homebrew: []
 homebrew_cask: []
-pip_packages: []
-pip: no
-pipx: yes
-pipx_packages_bin_dir: ~/.local/bin
-do_customize: yes
+uv_tools: []
+do_customize: true
 vim_colors_dir: ~/.vim/pack/colors
 vim_plugins_dir: ~/.vim/pack/plugins
 omz_plugins_dir: ~/.oh-my-zsh/custom/plugins
+
+vim_plugins:
+  - name: nerdtree
+    url: https://github.com/preservim/nerdtree
+  - name: fzf-vim
+    url: https://github.com/junegunn/fzf.vim
+  - name: vim-fugitive
+    url: https://github.com/tpope/vim-fugitive
+  - name: vim-markdown
+    url: https://github.com/preservim/vim-markdown
+  - name: vim-terraform
+    url: https://github.com/hashivim/vim-terraform
+
+vim_color_schemes:
+  - name: vim-wombat-scheme
+    url: https://github.com/sheerun/vim-wombat-scheme
+  - name: gruvbox
+    url: https://github.com/morhetz/gruvbox
+
+tmux_repo: https://github.com/gpakosz/.tmux.git
+
+zsh_plugins:
+  - name: zsh-autosuggestions
+    url: https://github.com/zsh-users/zsh-autosuggestions
+  - name: autoupdate
+    url: https://github.com/TamCore/autoupdate-oh-my-zsh-plugins

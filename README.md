@@ -1,81 +1,134 @@
 Bootstrap macOS with Ansible
 =========
 
-An ansible approach to automate macOS initial setup for mainly DevOps/SRE toolsets.
+An Ansible role to fully bootstrap macOS (Apple Silicon) for a DevOps/SRE workstation — from a bare machine to a fully configured environment.
+
+**What gets automated:**
+- Homebrew installation
+- Homebrew taps, formulae, and casks
+- Python tools via uv
+- oh-my-zsh installation
+- Vim plugins and color schemes
+- tmux and zsh plugins
+- Dotfiles deployment
 
 ## Requirements
 
-  1. Install Homebrew using the following command or follow the instructions on [Homebrew's official website](https://brew.sh/).
+Only one manual step is needed before running the playbook:
 
-     1. Run the following command
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-> Note: Homebrew will install Apple's command line tool as part of the installation. To check this, after successful installation, run `xcode-select -p` or install again `xcode-select --install`.
+1. Install Ansible:
 
-  2. Install Ansible using Homebrew or pip.
+   ```bash
+   pip3 install --user ansible
+   ```
 
-     1. Install Ansible using Homebrew `brew install ansible`.
+   Then add the pip user bin to your PATH (required to find `ansible-playbook`):
 
-     2. Install Ansible using pip. Follow the [installation instruction](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-macos)
+   ```bash
+   export PATH="$HOME/Library/Python/$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')/bin:$PATH"
+   ```
 
-  3. Install Rosetta 2, in case you've got a new Apple Silicon (M1) Mac with following command.
-  
-```
-sudo softwareupdate --install-rosetta --agree-to-license
-```
+   Or bootstrap via the system Python if Homebrew is not yet present.
 
-## Instalation
+2. Install required Ansible collections:
 
-Install oh-my-zsh
-```
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
+   ```bash
+   ansible-galaxy collection install -r requirements.yml
+   ```
 
-Run the ansible playbook without customization keeping your existing dotfiles un-changed:
-```
-ansible-playbook -i inventory playbook.yml -e "do_customize=no"
-```
+> Homebrew, oh-my-zsh, and all packages are installed automatically by the playbook.
 
-OR, if you want all customizations and existing dotfiles to be overriten: (there will be a backup of the changed file in the same folder)
-```
-ansible-playbook -i inventory playbook.yml
+## Usage
+
+> **Before running:** The file [group_vars/all/vars.yml](group_vars/all/vars.yml) includes a comprehensive, opinionated selection of Homebrew formulae and casks designed for a personal DevOps/SRE workstation. Make sure to review and adjust the lists to match your needs before executing the playbook — it will strictly enforce this configuration and remove anything not explicitly defined.
+
+Run the playbook (installs all packages, skips dotfiles):
+
+```bash
+ansible-playbook playbook.yml -K
 ```
 
-## zsh-completions
+> `-K` prompts for your sudo password. On first run it is required to install Homebrew and to write the passwordless sudoers entry (when `do_customize=true`). After that first full run, sudo is passwordless and `-K` is no longer needed.
 
-To activate these completions, add the following to your .zshrc:
+Run with dotfile deployment (existing files are backed up in-place):
 
-```  
-  if type brew &>/dev/null; then
-    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-
-    autoload -Uz compinit
-    compinit
-  fi
+```bash
+ansible-playbook playbook.yml -K -e "do_customize=true"
 ```
-You may also need to force rebuild `zcompdump`:
 
-```  
-rm -f ~/.zcompdump; compinit
-```
-Additionally, if you receive "zsh compinit: insecure directories" warnings when attempting
-to load these completions, you may need to run this:
+> This also configures passwordless sudo for your user (`/etc/sudoers.d/<user>`). Subsequent runs do not need `-K`.
 
-```  
-chmod -R go-w '/opt/homebrew/share/zsh'
+## Customisation
+
+Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
+
+| Variable | Description |
+|---|---|
+| `homebrew_tap` | Homebrew taps to add |
+| `homebrew` | Homebrew formulae to install (packages not in this list are removed) |
+| `homebrew_cask` | Homebrew casks to install (casks not in this list are removed) |
+| `uv_tools` | Python CLI tools to install via `uv tool install --upgrade` |
+| `homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |
+
+## Project structure
+
 ```
+.
+├── ansible.cfg               # Project-level Ansible config
+├── requirements.yml          # Ansible collection dependencies
+├── inventory                 # Local inventory (localhost)
+├── playbook.yml              # Entry point
+├── group_vars/
+│   └── all/
+│       └── vars.yml          # Package lists and defaults
+└── roles/
+    └── macinit/
+        ├── defaults/main.yml # Role defaults
+        ├── tasks/
+        │   ├── main.yml        # OS guard
+        │   ├── Darwin.yml      # Orchestrator
+        │   ├── homebrew.yml    # Homebrew install
+        │   ├── packages.yml    # Formulae, casks, uv tools
+        │   ├── dotfiles.yml    # oh-my-zsh, plugins, dotfiles
+        │   └── cleanup.yml     # brew cleanup & doctor
+        └── files/
+            └── dotfiles/       # Dotfiles copied to ~/
+```
+
+## Testing
+
+Install test dependencies:
+
+```bash
+make install-deps
+```
+
+| Command | What it does |
+|---|---|
+| `make lint` | yamllint + ansible-lint |
+| `make test` | Full Molecule run (packages + dotfiles) |
+| `make test-packages` | Packages-only scenario |
+| `make test-dotfiles` | Dotfiles-only scenario |
+| `make test-full` | lint + full Molecule run |
+
+CI runs automatically on push/PR via GitHub Actions (lint on Ubuntu, Molecule scenarios on `macos-latest`).
 
 ## Troubleshooting
 
-In case of issues with Homebrew packages, run `brew doctor`.
+- Run `brew doctor` to diagnose Homebrew issues.
+- If you see "zsh compinit: insecure directories" warnings, run:
+  ```bash
+  chmod -R go-w '/opt/homebrew/share/zsh'
+  ```
+- Force-rebuild zsh completions cache:
+  ```bash
+  rm -f ~/.zcompdump; compinit
+  ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author
 
 Mehdi Hassanpour

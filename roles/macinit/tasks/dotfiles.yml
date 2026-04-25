@@ -1,69 +1,86 @@
 ---
-- name: clone vim plugins for autoload
-  git:
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ ansible_facts['user_id'] }}  ALL = (ALL) NOPASSWD: ALL\n"
+    dest: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}"
+    owner: root
+    group: wheel
+    mode: "0440"
+    validate: /usr/sbin/visudo -cf %s
+  become: true
+  tags: [dotfiles, sudo]
+
+- name: Check if oh-my-zsh is already installed
+  ansible.builtin.stat:
+    path: ~/.oh-my-zsh
+  register: omz_dir
+  check_mode: false
+  tags: [dotfiles, omz]
+
+- name: Install oh-my-zsh
+  ansible.builtin.shell:
+    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  environment:
+    RUNZSH: "no"
+    CHSH: "no"
+  when: not omz_dir.stat.exists
+  tags: [dotfiles, omz]
+
+- name: Clone Vim plugins
+  ansible.builtin.git:
     dest: "{{ vim_plugins_dir }}/start/{{ item.name }}"
     repo: "{{ item.url }}"
-    clone: yes
-    update: yes
-    recursive: no
-  loop:
-  - name: nerdtree
-    url: https://github.com/preservim/nerdtree
-  - name: fzf-vim
-    url: https://github.com/junegunn/fzf.vim
-  - name: vim-fugitive
-    url: https://github.com/tpope/vim-fugitive
-  - name: vim-markdown
-    url: https://github.com/preservim/vim-markdown
-  - name: vim-terraform
-    url: https://github.com/hashivim/vim-terraform
-  become: no
+    clone: true
+    update: true
+    recursive: false
+  loop: "{{ vim_plugins }}"
+  become: false
+  tags: [dotfiles, vim]
 
-- name: clone vim colors for autoload
-  git:
+- name: Clone Vim color schemes
+  ansible.builtin.git:
     dest: "{{ vim_colors_dir }}/start/{{ item.name }}"
     repo: "{{ item.url }}"
-    clone: yes
-    update: yes
-    recursive: no
-  loop:
-  - name: vim-wombat-scheme
-    url: https://github.com/sheerun/vim-wombat-scheme
-  - name: gruvbox
-    url: https://github.com/morhetz/gruvbox
-  become: no  
+    clone: true
+    update: true
+    recursive: false
+  loop: "{{ vim_color_schemes }}"
+  become: false
+  tags: [dotfiles, vim]
 
-- name: clone Gregory Pakosz's .tmux
-  git:
+- name: Clone Gregory Pakosz's .tmux
+  ansible.builtin.git:
     dest: "~/.tmux"
-    repo: https://github.com/gpakosz/.tmux.git
-    clone: yes
-    update: yes
-    recursive: no
-  become: no   
+    repo: "{{ tmux_repo }}"
+    clone: true
+    update: true
+    recursive: false
+  become: false
+  tags: [dotfiles, tmux]
 
-- name: clone zsh custom plugins
-  git:
+- name: Clone zsh custom plugins
+  ansible.builtin.git:
     dest: "{{ omz_plugins_dir }}/{{ item.name }}"
     repo: "{{ item.url }}"
-    clone: yes
-    update: yes
-    recursive: no
-  loop:
-  - name: zsh-autosuggestions
-    url: https://github.com/zsh-users/zsh-autosuggestions
-  become: no
+    clone: true
+    update: true
+    recursive: false
+  loop: "{{ zsh_plugins }}"
+  become: false
+  tags: [dotfiles, zsh]
 
-- name: copying dotfiles
-  copy:
+- name: Copy dotfiles
+  ansible.builtin.copy:
     src: dotfiles/
-    dest: "~"
-    backup: yes
-    mode: 0640
+    dest: "~/"
+    backup: true
+    mode: "0640"
+  tags: [dotfiles]
 
-- name: symlinking .tmux
-  file:
+- name: Symlink .tmux.conf
+  ansible.builtin.file:
     src: "~/.tmux/.tmux.conf"
     dest: "~/.tmux.conf"
-    force: yes
+    force: true
     state: link
+  tags: [dotfiles, tmux]

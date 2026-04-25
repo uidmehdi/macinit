@@ -1,0 +1,24 @@
+---
+- name: Verify
+  hosts: all
+
+  tasks:
+    - name: Check Homebrew is installed
+      ansible.builtin.stat:
+        path: /opt/homebrew/bin/brew
+      register: brew_bin
+      failed_when: not brew_bin.stat.exists
+
+    - name: Check core formulae are installed
+      ansible.builtin.command: "which {{ item }}"
+      loop:
+        - git
+        - curl
+        - jq
+      changed_when: false
+
+    - name: Check Homebrew prefix is correct
+      ansible.builtin.command: brew --prefix
+      register: brew_prefix_out
+      changed_when: false
+      failed_when: brew_prefix_out.stdout != "/opt/homebrew"

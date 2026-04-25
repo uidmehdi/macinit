@@ -1,0 +1,19 @@
+# Local override files — machine-specific, never committed
+*.local
+.aliases.local
+.zshenv.local
+.zshrc.local
+
+# Ansible retry files
+*.retry
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Molecule
+molecule/**/molecule.yml.bak
+
+# macOS
+.DS_Store

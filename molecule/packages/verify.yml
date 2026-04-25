@@ -1,0 +1,32 @@
+---
+- name: Verify packages
+  hosts: all
+
+  tasks:
+    - name: Check Homebrew formulae binaries are on PATH
+      ansible.builtin.command: "which {{ item }}"
+      loop:
+        - git
+        - curl
+        - jq
+        - bat
+        - uv
+      changed_when: false
+
+    - name: Check uv tools are installed
+      ansible.builtin.command: uv tool list
+      register: uv_tool_list
+      changed_when: false
+      failed_when: "'az-account-switcher' not in uv_tool_list.stdout"
+
+    - name: Check ~/.local/bin is populated by uv
+      ansible.builtin.stat:
+        path: ~/.local/bin
+      register: local_bin
+      failed_when: not local_bin.stat.exists
+
+    - name: Verify Homebrew prefix is Apple Silicon path
+      ansible.builtin.command: brew --prefix
+      register: brew_prefix_check
+      changed_when: false
+      failed_when: brew_prefix_check.stdout != "/opt/homebrew"
