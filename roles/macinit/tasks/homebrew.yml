@@ -6,11 +6,46 @@
   check_mode: false
   tags: [brew]
 
+- name: Warm sudo credentials for Homebrew installer
+  block:
+    - name: Verify sudo access
+      ansible.builtin.command: /usr/bin/true
+      become: true
+      become_flags: "-n"
+      changed_when: false
+      when: not brew_bin.stat.exists
+      tags: [brew]
+  rescue:
+    - name: Abort — sudo required for Homebrew install
+      ansible.builtin.fail:
+        msg: >-
+          Sudo access is required to install Homebrew but no cached credentials were found.
+          Re-run the playbook with -K to provide your password: ansible-playbook playbook.yml -K
+      tags: [brew]
+
 - name: Install Homebrew
   ansible.builtin.shell:
     cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    executable: /bin/bash
   environment:
     NONINTERACTIVE: "1"
+    HOME: "{{ ansible_env.HOME }}"
+    USER: "{{ ansible_facts['user_id'] }}"
   when: not brew_bin.stat.exists
   changed_when: not brew_bin.stat.exists
+  tags: [brew]
+
+- name: Verify Homebrew binary exists after install
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew
+  register: brew_bin_post
+  when: not brew_bin.stat.exists
+  tags: [brew]
+
+- name: Fail if Homebrew binary is missing after install
+  ansible.builtin.fail:
+    msg: "Homebrew installation appeared to succeed but /opt/homebrew/bin/brew was not found."
+  when:
+    - not brew_bin.stat.exists
+    - not brew_bin_post.stat.exists
   tags: [brew]
