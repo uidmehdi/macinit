@@ -23,6 +23,9 @@ All variables have defaults in `defaults/main.yml`. Package lists are defined in
 | `homebrew` | `[]` | List of formulae to install (packages not in this list are removed) |
 | `homebrew_cask` | `[]` | List of casks to install (casks not in this list are removed) |
 | `homebrew_upgrade_all` | `true` | Upgrade all formulae and casks on each run. Set to `false` to skip upgrades. |
+| `homebrew_cask_sudo_keepalive` | `true` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts |
+| `homebrew_cask_sudo_keepalive_interval` | `60` | Seconds between sudo timestamp refreshes during cask operations |
+| `homebrew_cask_temporary_passwordless_sudo` | `false` | Temporarily create a sudoers drop-in for the cask phase only, then remove it |
 | `uv_tools` | `[]` | Python CLI tools to install via `uv tool install --upgrade` |
 | `do_customize` | `true` | Copy dotfiles and clone Git repos |
 | `vim_plugins_dir` | `~/.vim/pack/plugins` | Vim plugins directory |

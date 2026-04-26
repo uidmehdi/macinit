@@ -57,49 +57,100 @@
   when: homebrew_upgrade_all | default(true)
   tags: [packages, brew]
 
-- name: Install Homebrew cask packages
+- name: Manage Homebrew casks
   block:
-    - name: Install cask
+    - name: Temporarily allow passwordless sudo for Homebrew cask installers
+      ansible.builtin.copy:
+        content: "{{ ansible_facts['user_id'] }}  ALL = (ALL) NOPASSWD: ALL\n"
+        dest: "{{ homebrew_cask_temporary_sudoers_path }}"
+        owner: root
+        group: wheel
+        mode: "0440"
+        validate: /usr/sbin/visudo -cf %s
+      become: true
+      when:
+        - homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+
+    - name: Warm sudo credentials for Homebrew cask installers
+      ansible.builtin.command: /usr/bin/true
+      become: true
+      changed_when: false
+      when:
+        - homebrew_cask_sudo_keepalive | default(true) | bool
+        - not homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+
+    - name: Keep sudo credentials warm during Homebrew cask operations
+      ansible.builtin.shell:
+        cmd: >-
+          while /usr/bin/sudo -n -v; do
+          /bin/sleep {{ homebrew_cask_sudo_keepalive_interval | default(60) | int }};
+          done & echo $!
+        executable: /bin/bash
+      register: homebrew_cask_sudo_keepalive_pid
+      changed_when: false
+      when:
+        - homebrew_cask_sudo_keepalive | default(true) | bool
+        - not homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+
+    - name: Install Homebrew cask packages
+      block:
+        - name: Install cask
+          community.general.homebrew_cask:
+            name: "{{ item.name | default(item) }}"
+            state: present
+            install_options: "{{ item.install_options | default(omit) }}"
+            update_homebrew: false
+          loop: "{{ homebrew_cask }}"
+      rescue:
+        - name: Warn on failed cask installs
+          ansible.builtin.debug:
+            msg: "Cask install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
+      when: homebrew_cask | length > 0
+
+    - name: Get installed Homebrew casks
+      ansible.builtin.command: "{{ brew_bin_path }}/brew list --cask"
+      register: brew_casks_installed
+      changed_when: false
+      check_mode: false
+
+    - name: Remove casks not in desired list
       community.general.homebrew_cask:
-        name: "{{ item.name | default(item) }}"
-        state: present
-        install_options: "{{ item.install_options | default(omit) }}"
-        update_homebrew: false
-      loop: "{{ homebrew_cask }}"
-  rescue:
-    - name: Warn on failed cask installs
-      ansible.builtin.debug:
-        msg: "Cask install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
-  when: homebrew_cask | length > 0
-  tags: [packages, cask]
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ brew_casks_installed.stdout_lines }}"
+      when: homebrew_cask | length > 0 and item not in desired_casks
 
-- name: Get installed Homebrew casks
-  ansible.builtin.command: "{{ brew_bin_path }}/brew list --cask"
-  register: brew_casks_installed
-  changed_when: false
-  check_mode: false
-  tags: [packages, cask]
+    - name: Upgrade all Homebrew casks
+      block:
+        - name: Upgrade casks
+          community.general.homebrew_cask:
+            upgrade_all: true
+      when: homebrew_upgrade_all | default(true)
+      rescue:
+        - name: Warn on failed cask upgrades
+          ansible.builtin.debug:
+            msg: >-
+              Cask upgrade failed: {{ ansible_failed_result.msg | default('unknown error') }}.
+              Casks requiring sudo (e.g. docker-desktop) may need manual: brew upgrade --cask
+  always:
+    - name: Stop sudo keepalive for Homebrew cask installers
+      ansible.builtin.command: "/bin/kill {{ homebrew_cask_sudo_keepalive_pid.stdout }}"
+      changed_when: false
+      failed_when: false
+      when:
+        - homebrew_cask_sudo_keepalive_pid is defined
+        - homebrew_cask_sudo_keepalive_pid.stdout is defined
+        - homebrew_cask_sudo_keepalive_pid.stdout | length > 0
 
-- name: Remove casks not in desired list
-  community.general.homebrew_cask:
-    name: "{{ item }}"
-    state: absent
-  loop: "{{ brew_casks_installed.stdout_lines }}"
-  when: homebrew_cask | length > 0 and item not in desired_casks
-  tags: [packages, cask]
-
-- name: Upgrade all Homebrew casks
-  block:
-    - name: Upgrade casks
-      community.general.homebrew_cask:
-        upgrade_all: true
-  when: homebrew_upgrade_all | default(true)
-  rescue:
-    - name: Warn on failed cask upgrades
-      ansible.builtin.debug:
-        msg: >-
-          Cask upgrade failed: {{ ansible_failed_result.msg | default('unknown error') }}.
-          Casks requiring sudo (e.g. docker-desktop) may need manual: brew upgrade --cask
+    - name: Remove temporary passwordless sudo for Homebrew cask installers
+      ansible.builtin.file:
+        path: "{{ homebrew_cask_temporary_sudoers_path }}"
+        state: absent
+      become: true
+      when: homebrew_cask_temporary_passwordless_sudo | default(false) | bool
   tags: [packages, cask]
 
 - name: Install or upgrade Python tools via uv
