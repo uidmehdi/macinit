@@ -4,6 +4,10 @@ brew_bin_path: "{{ brew_prefix }}/bin"
 homebrew_tap: []
 homebrew: []
 homebrew_cask: []
+homebrew_cask_sudo_keepalive: true
+homebrew_cask_sudo_keepalive_interval: 60
+homebrew_cask_temporary_passwordless_sudo: false
+homebrew_cask_temporary_sudoers_path: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}-homebrew-cask"
 uv_tools: []
 do_customize: true
 vim_colors_dir: ~/.vim/pack/colors

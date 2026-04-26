@@ -69,6 +69,8 @@ Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
 | `homebrew_cask` | Homebrew casks to install (casks not in this list are removed) |
 | `uv_tools` | Python CLI tools to install via `uv tool install --upgrade` |
 | `homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |
+| `homebrew_cask_sudo_keepalive` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts (default: `true`). |
+| `homebrew_cask_temporary_passwordless_sudo` | Temporarily create a sudoers drop-in for the cask phase only, then remove it. Use this if keepalive is not enough for long or stubborn cask installers (default: `false`). |
 
 ## Project structure
 
