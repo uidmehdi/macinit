@@ -20,7 +20,7 @@ All variables have defaults in `defaults/main.yml`. Package lists are defined in
 | `brew_prefix` | `/opt/homebrew` | Homebrew prefix path |
 | `brew_bin_path` | `{{ brew_prefix }}/bin` | Homebrew bin directory |
 | `homebrew_tap` | `[]` | List of taps to add |
-| `homebrew` | `[]` | List of formulae to install (packages not in this list are removed) |
+| `homebrew` | `[]` | List of formulae to install (packages not in this list are removed). Use fully qualified names like `fluxcd/tap/flux` when a tapped formula conflicts with a core formula. |
 | `homebrew_cask` | `[]` | List of casks to install (casks not in this list are removed) |
 | `homebrew_upgrade_all` | `true` | Upgrade all formulae and casks on each run. Set to `false` to skip upgrades. |
 | `homebrew_cask_sudo_keepalive` | `true` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts |
