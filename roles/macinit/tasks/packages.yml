@@ -35,9 +35,9 @@
                      + (homebrew_cask | select('string') | list) }}"
   tags: [packages, brew, cask]
 
-- name: Get installed Homebrew formulae
-  ansible.builtin.command: "{{ brew_bin_path }}/brew leaves"
-  register: brew_leaves
+- name: Get explicitly installed Homebrew formulae
+  ansible.builtin.command: "{{ brew_bin_path }}/brew list --formula --full-name --installed-on-request"
+  register: brew_formulae_installed
   changed_when: false
   check_mode: false
   tags: [packages, brew]
@@ -46,7 +46,7 @@
   community.general.homebrew:
     name: "{{ item }}"
     state: absent
-  loop: "{{ brew_leaves.stdout_lines }}"
+  loop: "{{ brew_formulae_installed.stdout_lines }}"
   when: homebrew | length > 0 and item not in desired_formulae
   tags: [packages, brew]
 

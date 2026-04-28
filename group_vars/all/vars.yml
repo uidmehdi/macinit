@@ -4,8 +4,6 @@ do_customize: false
 homebrew_tap:
   - Azure/kubelogin
   - aquasecurity/trivy
-  - derailed/k9s
-  - esolitos/ipa
   - fluxcd/tap
   - warrensbox/tap
 
@@ -26,7 +24,7 @@ homebrew:
   - eza
   - fd
   - ffmpeg
-  - flux
+  - fluxcd/tap/flux
   - fzf
   - gist
   - git
@@ -42,12 +40,11 @@ homebrew:
   - jenv
   - jq
   - just
-  - k9s
   - kind
   - krew
   - kubeconform
   - kubectx
-  - kubelogin
+  - Azure/kubelogin/kubelogin
   - kubernetes-cli
   - kustomize
   - lazygit
@@ -55,7 +52,6 @@ homebrew:
   - powerlevel10k
   - pre-commit
   - rclone
-  - reattach-to-user-namespace
   - ripgrep
   - rsync
   - sops
@@ -69,7 +65,7 @@ homebrew:
   - tflint
   - tmux
   - tree
-  - trivy
+  - aquasecurity/trivy/trivy
   - uv
   - vim
   - watch
@@ -84,6 +80,7 @@ homebrew:
 homebrew_cask:
   - alt-tab
   - anki
+  - antigravity
   - balenaetcher
   - betterdisplay
   - bitwarden
@@ -121,7 +118,7 @@ homebrew_cask:
   - temurin
   - temurin@17
   - temurin@21
-  - tfswitch
+  - warrensbox/tap/tfswitch
   - tor-browser
   - visual-studio-code
   - vlc
