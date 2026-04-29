@@ -29,10 +29,10 @@
 
 - name: Resolve desired package names
   ansible.builtin.set_fact:
-    desired_formulae: "{{ (homebrew | selectattr('name', 'defined') | map(attribute='name') | list)
-                        + (homebrew | select('string') | list) }}"
-    desired_casks: "{{ (homebrew_cask | selectattr('name', 'defined') | map(attribute='name') | list)
-                     + (homebrew_cask | select('string') | list) }}"
+    desired_formulae: "{{ (homebrew | selectattr('name', 'defined') | map(attribute='name') | map('lower') | list)
+                        + (homebrew | select('string') | map('lower') | list) }}"
+    desired_casks: "{{ (homebrew_cask | selectattr('name', 'defined') | map(attribute='name') | map('regex_replace', '^.*/', '') | map('lower') | list)
+                     + (homebrew_cask | select('string') | map('regex_replace', '^.*/', '') | map('lower') | list) }}"
   tags: [packages, brew, cask]
 
 - name: Get explicitly installed Homebrew formulae
@@ -47,7 +47,7 @@
     name: "{{ item }}"
     state: absent
   loop: "{{ brew_formulae_installed.stdout_lines }}"
-  when: homebrew | length > 0 and item not in desired_formulae
+  when: homebrew | length > 0 and item | lower not in desired_formulae
   tags: [packages, brew]
 
 - name: Upgrade all Homebrew formulae
@@ -121,7 +121,7 @@
         name: "{{ item }}"
         state: absent
       loop: "{{ brew_casks_installed.stdout_lines }}"
-      when: homebrew_cask | length > 0 and item not in desired_casks
+      when: homebrew_cask | length > 0 and item | lower not in desired_casks
 
     - name: Upgrade all Homebrew casks
       block:
