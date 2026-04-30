@@ -71,6 +71,7 @@ Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
 | `homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |
 | `homebrew_cask_sudo_keepalive` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts (default: `true`). |
 | `homebrew_cask_temporary_passwordless_sudo` | Temporarily create a sudoers drop-in for the cask phase only, then remove it. Use this if keepalive is not enough for long or stubborn cask installers (default: `false`). |
+| `zsh_fix_compinit_permissions` | Remove group/world write permissions from zsh completion directories and clear `.zcompdump` to avoid `compinit: insecure directories` warnings (default: `true`). |
 
 ## Project structure
 
@@ -92,6 +93,7 @@ Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
         │   ├── homebrew.yml    # Homebrew install
         │   ├── packages.yml    # Formulae, casks, uv tools
         │   ├── dotfiles.yml    # oh-my-zsh, plugins, dotfiles
+        │   ├── zsh.yml         # zsh completion permission fixes
         │   └── cleanup.yml     # brew cleanup & doctor
         └── files/
             └── dotfiles/       # Dotfiles copied to ~/
@@ -118,10 +120,7 @@ CI runs automatically on push/PR via GitHub Actions (lint on Ubuntu, Molecule sc
 ## Troubleshooting
 
 - Run `brew doctor` to diagnose Homebrew issues.
-- If you see "zsh compinit: insecure directories" warnings, run:
-  ```bash
-  chmod -R go-w '/opt/homebrew/share/zsh'
-  ```
+- If you see "zsh compinit: insecure directories" warnings, run the playbook again. The role removes group/world write permissions from Homebrew zsh completion directories by default.
 - Force-rebuild zsh completions cache:
   ```bash
   rm -f ~/.zcompdump; compinit

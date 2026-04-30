@@ -28,6 +28,8 @@ All variables have defaults in `defaults/main.yml`. Package lists are defined in
 | `homebrew_cask_temporary_passwordless_sudo` | `false` | Temporarily create a sudoers drop-in for the cask phase only, then remove it |
 | `uv_tools` | `[]` | Python CLI tools to install via `uv tool install --upgrade` |
 | `do_customize` | `true` | Copy dotfiles and clone Git repos |
+| `zsh_fix_compinit_permissions` | `true` | Remove group/world write permissions from zsh completion directories and clear `.zcompdump` |
+| `zsh_compinit_permission_dirs` | `{{ brew_prefix }}/share/zsh` | Directories to secure for zsh `compinit` |
 | `vim_plugins_dir` | `~/.vim/pack/plugins` | Vim plugins directory |
 | `vim_colors_dir` | `~/.vim/pack/colors` | Vim color schemes directory |
 | `omz_plugins_dir` | `~/.oh-my-zsh/custom/plugins` | Oh My Zsh custom plugins directory |
@@ -46,6 +48,7 @@ Tasks
 | `homebrew.yml` | Installs Homebrew if not already present |
 | `packages.yml` | Taps, formulae, casks, uv tool installs and upgrades; removes packages not in the desired list |
 | `dotfiles.yml` | Configures passwordless sudo, installs oh-my-zsh, clones Vim plugins/colors, tmux and zsh plugins, copies dotfiles |
+| `zsh.yml` | Secures zsh completion directories to avoid `compinit: insecure directories` warnings |
 | `cleanup.yml` | `brew autoremove`, `brew cleanup`, and `brew doctor` |
 
 Dotfiles managed

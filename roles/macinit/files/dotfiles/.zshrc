@@ -60,6 +60,16 @@ plugins=(
 )
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Completion paths (must be set before Oh My Zsh runs compinit)
+# ──────────────────────────────────────────────────────────────────────────────
+typeset -U fpath
+if command -v brew >/dev/null; then
+  brew_zsh_completions="$(brew --prefix)/share/zsh-completions"
+  [[ -d "$brew_zsh_completions" ]] && fpath=("$brew_zsh_completions" $fpath)
+  unset brew_zsh_completions
+fi
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Load Oh My Zsh *before* heavy customizations
 # ──────────────────────────────────────────────────────────────────────────────
 source "$ZSH/oh-my-zsh.sh"
@@ -72,17 +82,6 @@ if [[ -d "$(brew --prefix)/share/powerlevel10k" ]]; then
 fi
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Completions
-# ──────────────────────────────────────────────────────────────────────────────
-FPATH="$(brew --prefix)/share/zsh-completions:$FPATH"
-
-# Optional: external completions repo (more completions, but careful with startup)
-# fpath+="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-completions/src"
-
-autoload -Uz compinit
-compinit
 
 # Cache completions for better performance
 zstyle ':completion:*' use-cache on

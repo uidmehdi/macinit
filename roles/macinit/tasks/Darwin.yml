@@ -12,6 +12,11 @@
   when: do_customize | bool
   tags: [dotfiles]
 
+- name: Fix zsh completion permissions
+  ansible.builtin.include_tasks: zsh.yml
+  when: zsh_fix_compinit_permissions | bool
+  tags: [zsh, dotfiles]
+
 - name: Run cleanup
   ansible.builtin.include_tasks: cleanup.yml
   tags: [cleanup]
