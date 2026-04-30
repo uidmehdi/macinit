@@ -10,6 +10,12 @@ homebrew_cask_temporary_passwordless_sudo: false
 homebrew_cask_temporary_sudoers_path: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}-homebrew-cask"
 uv_tools: []
 do_customize: true
+zsh_fix_compinit_permissions: true
+zsh_compinit_permission_dirs:
+  - "{{ brew_prefix }}/share/zsh"
+  - "{{ brew_prefix }}/share/zsh-completions"
+  - "{{ ansible_facts['user_dir'] }}/.oh-my-zsh"
+  - /usr/local/share/zsh
 vim_colors_dir: ~/.vim/pack/colors
 vim_plugins_dir: ~/.vim/pack/plugins
 omz_plugins_dir: ~/.oh-my-zsh/custom/plugins
