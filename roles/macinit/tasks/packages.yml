@@ -46,8 +46,12 @@
   community.general.homebrew:
     name: "{{ item }}"
     state: absent
+  register: brew_formula_remove_result
+  failed_when: >-
+    brew_formula_remove_result is failed and
+    'Refusing to uninstall' not in (brew_formula_remove_result.msg | default(''))
   loop: "{{ brew_formulae_installed.stdout_lines }}"
-  when: homebrew | length > 0 and item | lower not in desired_formulae
+  when: homebrew_prune_enabled | bool and homebrew | length > 0 and item | lower not in desired_formulae
   tags: [packages, brew]
 
 - name: Upgrade all Homebrew formulae
@@ -121,7 +125,7 @@
         name: "{{ item }}"
         state: absent
       loop: "{{ brew_casks_installed.stdout_lines }}"
-      when: homebrew_cask | length > 0 and item | lower not in desired_casks
+      when: homebrew_prune_enabled | bool and homebrew_cask | length > 0 and item | lower not in desired_casks
 
     - name: Upgrade all Homebrew casks
       block:

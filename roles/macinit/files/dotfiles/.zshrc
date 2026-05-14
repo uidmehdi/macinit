@@ -59,6 +59,9 @@ plugins=(
   autoupdate
 )
 
+command -v brew >/dev/null && plugins+=(brew)
+command -v tmux >/dev/null && plugins+=(tmux)
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Completion paths (must be set before Oh My Zsh runs compinit)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -143,7 +146,9 @@ zstyle ':omz:plugins:nvm' lazy yes
 
 # jenv
 export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
+if command -v jenv >/dev/null; then
+  eval "$(jenv init -)"
+fi
 
 # ──────────────────────────────────────────────────────────────────────────────
 # syntax highlighting (must come AFTER compinit & most plugins)
