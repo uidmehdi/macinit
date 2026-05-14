@@ -4,6 +4,7 @@ brew_bin_path: "{{ brew_prefix }}/bin"
 homebrew_tap: []
 homebrew: []
 homebrew_cask: []
+homebrew_prune_enabled: "{{ lookup('env', 'CI') | default('false', true) | bool }}"
 homebrew_cask_sudo_keepalive: true
 homebrew_cask_sudo_keepalive_interval: 60
 homebrew_cask_temporary_passwordless_sudo: false

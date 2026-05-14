@@ -16,7 +16,7 @@
   tags: [zsh, dotfiles]
 
 - name: Audit zsh compinit insecure paths
-  ansible.builtin.command: /bin/zsh -lic 'autoload -Uz compaudit; compaudit'
+  ansible.builtin.command: /bin/zsh -fc 'autoload -Uz compaudit; compaudit'
   register: zsh_compaudit
   changed_when: false
   failed_when: false
