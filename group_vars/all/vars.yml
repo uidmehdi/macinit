@@ -27,6 +27,7 @@ homebrew:
   - ffmpeg
   - fluxcd/tap/flux
   - fzf
+  - gh
   - gist
   - git
   - git-filter-repo
@@ -50,6 +51,7 @@ homebrew:
   - kustomize
   - lazygit
   - libpq
+  - mise
   - powerlevel10k
   - pre-commit
   - rclone
@@ -89,6 +91,7 @@ homebrew_cask:
   - bruno
   - claude-code
   - codex
+  - copilot-cli
   - dbeaver-community
   - docker-desktop
   - drawio
