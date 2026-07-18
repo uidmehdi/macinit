@@ -66,9 +66,27 @@
   tags: [packages, brew]
 
 - name: Upgrade all Homebrew formulae
-  ansible.builtin.command: "{{ brew_bin_path }}/brew upgrade"
-  register: brew_upgrade
-  changed_when: brew_upgrade.stdout | length > 0
+  block:
+    - name: Get outdated Homebrew formulae
+      ansible.builtin.command: "{{ brew_bin_path }}/brew outdated --formula --quiet"
+      register: brew_outdated_formulae
+      changed_when: false
+      check_mode: false
+
+    - name: Upgrade outdated Homebrew formulae
+      vars:
+        # Exclude ansible/ansible-lint: upgrading the formula that is currently
+        # running this playbook corrupts the controller's module communication
+        # mid-run (deserialization failures). Upgrade these manually instead.
+        formulae_to_upgrade: "{{ brew_outdated_formulae.stdout_lines | difference(['ansible', 'ansible-lint']) }}"
+      ansible.builtin.command: "{{ brew_bin_path }}/brew upgrade --formula {{ formulae_to_upgrade | join(' ') }}"
+      register: brew_upgrade
+      changed_when: brew_upgrade.stdout is defined and brew_upgrade.stdout | length > 0
+      when: formulae_to_upgrade | length > 0
+  rescue:
+    - name: Warn on failed formulae upgrade
+      ansible.builtin.debug:
+        msg: "Formula upgrade failed: {{ ansible_failed_result.msg | default('unknown error') }}"
   when: homebrew_upgrade_all | default(true)
   tags: [packages, brew]
 
