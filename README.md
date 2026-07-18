@@ -66,7 +66,8 @@ Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
 |---|---|
 | `homebrew_tap` | Homebrew taps to add |
 | `homebrew` | Homebrew formulae to install (packages not in this list are removed). Use fully qualified names like `fluxcd/tap/flux` when a tapped formula conflicts with a core formula. |
-| `homebrew_prune_enabled` | Remove packages not listed in `homebrew`/`homebrew_cask` (formulae and casks). Default is CI-aware: enabled in CI (`CI=true`), disabled for local runs unless explicitly set to `true`. |
+| `homebrew_prune_enabled` | Remove packages not listed in `homebrew`/`homebrew_cask` (formulae and casks) and untap taps not listed in `homebrew_tap`. Default is CI-aware: enabled in CI (`CI=true`), disabled for local runs unless explicitly set to `true`. |
+| `homebrew_protected_taps` | Taps that are never removed during pruning (default: Homebrew's own `homebrew/core`, `homebrew/cask`, `homebrew/bundle`, `homebrew/services`). |
 | `homebrew_cask` | Homebrew casks to install (casks not in this list are removed) |
 | `uv_tools` | Python CLI tools to install via `uv tool install --upgrade` |
 | `homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |

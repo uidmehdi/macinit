@@ -11,6 +11,17 @@
   when: homebrew_tap | length > 0
   tags: [packages, brew]
 
+- name: Trust third-party Homebrew taps
+  ansible.builtin.command: "{{ brew_bin_path }}/brew trust {{ item }}"
+  register: brew_trust_result
+  changed_when: "'now trusted' in (brew_trust_result.stdout | lower)"
+  failed_when: >-
+    brew_trust_result.rc != 0 and
+    'already trusted' not in (brew_trust_result.stderr | lower)
+  loop: "{{ homebrew_tap }}"
+  when: homebrew_tap | length > 0
+  tags: [packages, brew]
+
 - name: Install Homebrew formulae
   block:
     - name: Install formula
@@ -156,6 +167,29 @@
       become: true
       when: homebrew_cask_temporary_passwordless_sudo | default(false) | bool
   tags: [packages, cask]
+
+- name: Get installed Homebrew taps
+  ansible.builtin.command: "{{ brew_bin_path }}/brew tap"
+  register: brew_taps_installed
+  changed_when: false
+  check_mode: false
+  when: homebrew_prune_enabled | bool
+  tags: [packages, brew]
+
+- name: Remove taps not in desired list
+  community.general.homebrew_tap:
+    name: "{{ item }}"
+    state: absent
+  register: brew_tap_remove_result
+  failed_when: >-
+    brew_tap_remove_result is failed and
+    'is not allowed' not in (brew_tap_remove_result.msg | default(''))
+  loop: "{{ brew_taps_installed.stdout_lines | default([]) }}"
+  when:
+    - homebrew_prune_enabled | bool
+    - item | lower not in (homebrew_tap | map('lower') | list)
+    - item | lower not in (homebrew_protected_taps | map('lower') | list)
+  tags: [packages, brew]
 
 - name: Install or upgrade Python tools via uv
   ansible.builtin.command: "{{ brew_bin_path }}/uv tool install --upgrade {{ item }}"

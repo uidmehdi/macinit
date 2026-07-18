@@ -6,6 +6,7 @@ homebrew_tap:
   - aquasecurity/trivy
   - fluxcd/tap
   - warrensbox/tap
+  - terraform-linters/tap
 
 homebrew:
   - age
@@ -61,8 +62,8 @@ homebrew:
   - stern
   - syft
   - terraform-docs
+  - terraform-linters/tap/tflint
   - terraform-ls
-  - tflint
   - tmux
   - tree
   - aquasecurity/trivy/trivy
