@@ -202,7 +202,8 @@
   register: macinit_brew_tap_remove_result
   failed_when: >-
     macinit_brew_tap_remove_result is failed and
-    'is not allowed' not in (macinit_brew_tap_remove_result.msg | default(''))
+    'is not allowed' not in (macinit_brew_tap_remove_result.msg | default('')) and
+    'Refusing to untap' not in (macinit_brew_tap_remove_result.msg | default(''))
   loop: "{{ macinit_brew_taps_installed.stdout_lines | default([]) }}"
   when:
     - macinit_homebrew_prune_enabled | bool
