@@ -1,14 +1,14 @@
 ---
-do_customize: false
+macinit_do_customize: false
 
-homebrew_tap:
+macinit_homebrew_tap:
   - Azure/kubelogin
   - aquasecurity/trivy
   - fluxcd/tap
   - warrensbox/tap
   - terraform-linters/tap
 
-homebrew:
+macinit_homebrew:
   - age
   - ansible
   - ansible-lint
@@ -80,7 +80,7 @@ homebrew:
   - zsh-completions
   - zsh-syntax-highlighting
 
-homebrew_cask:
+macinit_homebrew_cask:
   - alt-tab
   - anki
   - antigravity
@@ -128,5 +128,5 @@ homebrew_cask:
   - vlc
   - whatsapp
 
-uv_tools:
+macinit_uv_tools:
   - az-account-switcher

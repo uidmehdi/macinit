@@ -13,7 +13,7 @@
 - name: Check if oh-my-zsh is already installed
   ansible.builtin.stat:
     path: ~/.oh-my-zsh
-  register: omz_dir
+  register: macinit_omz_dir
   check_mode: false
   tags: [dotfiles, omz]
 
@@ -23,35 +23,39 @@
   environment:
     RUNZSH: "no"
     CHSH: "no"
-  when: not omz_dir.stat.exists
+  when: not macinit_omz_dir.stat.exists
+  changed_when: true
   tags: [dotfiles, omz]
 
 - name: Clone Vim plugins
   ansible.builtin.git:
-    dest: "{{ vim_plugins_dir }}/start/{{ item.name }}"
+    dest: "{{ macinit_vim_plugins_dir }}/start/{{ item.name }}"
     repo: "{{ item.url }}"
+    version: "{{ item.version | default('master') }}"
     clone: true
     update: true
     recursive: false
-  loop: "{{ vim_plugins }}"
+  loop: "{{ macinit_vim_plugins }}"
   become: false
   tags: [dotfiles, vim]
 
 - name: Clone Vim color schemes
   ansible.builtin.git:
-    dest: "{{ vim_colors_dir }}/start/{{ item.name }}"
+    dest: "{{ macinit_vim_colors_dir }}/start/{{ item.name }}"
     repo: "{{ item.url }}"
+    version: "{{ item.version | default('master') }}"
     clone: true
     update: true
     recursive: false
-  loop: "{{ vim_color_schemes }}"
+  loop: "{{ macinit_vim_color_schemes }}"
   become: false
   tags: [dotfiles, vim]
 
 - name: Clone Gregory Pakosz's .tmux
   ansible.builtin.git:
     dest: "~/.tmux"
-    repo: "{{ tmux_repo }}"
+    repo: "{{ macinit_tmux_repo }}"
+    version: "{{ macinit_tmux_repo_version }}"
     clone: true
     update: true
     recursive: false
@@ -60,12 +64,13 @@
 
 - name: Clone zsh custom plugins
   ansible.builtin.git:
-    dest: "{{ omz_plugins_dir }}/{{ item.name }}"
+    dest: "{{ macinit_omz_plugins_dir }}/{{ item.name }}"
     repo: "{{ item.url }}"
+    version: "{{ item.version | default('master') }}"
     clone: true
     update: true
     recursive: false
-  loop: "{{ zsh_plugins }}"
+  loop: "{{ macinit_zsh_plugins }}"
   become: false
   tags: [dotfiles, zsh]
 

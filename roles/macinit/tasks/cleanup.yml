@@ -1,19 +1,19 @@
 ---
 - name: Remove unused Homebrew dependencies
-  ansible.builtin.command: "{{ brew_bin_path }}/brew autoremove"
-  register: brew_autoremove
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew autoremove"
+  register: macinit_brew_autoremove
   changed_when: false
   tags: [cleanup, brew]
 
 - name: Remove stale lock files and outdated downloads
-  ansible.builtin.command: "{{ brew_bin_path }}/brew cleanup"
-  register: brew_cleanup
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew cleanup"
+  register: macinit_brew_cleanup
   changed_when: false
   tags: [cleanup, brew]
 
 - name: Check system for potential problems
-  ansible.builtin.command: "{{ brew_bin_path }}/brew doctor"
-  register: brew_doctor
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew doctor"
+  register: macinit_brew_doctor
   changed_when: false
-  failed_when: brew_doctor.rc not in [0, 1]
+  failed_when: macinit_brew_doctor.rc not in [0, 1]
   tags: [cleanup, brew]

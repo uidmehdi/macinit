@@ -1,53 +1,63 @@
 ---
-brew_prefix: /opt/homebrew
-brew_bin_path: "{{ brew_prefix }}/bin"
-homebrew_tap: []
-homebrew: []
-homebrew_cask: []
-homebrew_prune_enabled: "{{ lookup('env', 'CI') | default('false', true) | bool }}"
-homebrew_protected_taps:
+macinit_brew_prefix: /opt/homebrew
+macinit_brew_bin_path: "{{ macinit_brew_prefix }}/bin"
+macinit_homebrew_tap: []
+macinit_homebrew: []
+macinit_homebrew_cask: []
+macinit_homebrew_prune_enabled: "{{ lookup('env', 'CI') | default('false', true) | bool }}"
+macinit_homebrew_protected_taps:
   - homebrew/core
   - homebrew/cask
   - homebrew/bundle
   - homebrew/services
-homebrew_cask_sudo_keepalive: true
-homebrew_cask_sudo_keepalive_interval: 60
-homebrew_cask_temporary_passwordless_sudo: false
-homebrew_cask_temporary_sudoers_path: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}-homebrew-cask"
-uv_tools: []
-do_customize: true
-zsh_fix_compinit_permissions: true
-zsh_compinit_permission_dirs:
-  - "{{ brew_prefix }}/share/zsh"
-  - "{{ brew_prefix }}/share/zsh-completions"
+macinit_homebrew_cask_sudo_keepalive: true
+macinit_homebrew_cask_sudo_keepalive_interval: 60
+macinit_homebrew_cask_temporary_passwordless_sudo: false
+macinit_homebrew_cask_temporary_sudoers_path: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}-homebrew-cask"
+macinit_uv_tools: []
+macinit_do_customize: true
+macinit_zsh_fix_compinit_permissions: true
+macinit_zsh_compinit_permission_dirs:
+  - "{{ macinit_brew_prefix }}/share/zsh"
+  - "{{ macinit_brew_prefix }}/share/zsh-completions"
   - "{{ ansible_facts['user_dir'] }}/.oh-my-zsh"
   - /usr/local/share/zsh
-vim_colors_dir: ~/.vim/pack/colors
-vim_plugins_dir: ~/.vim/pack/plugins
-omz_plugins_dir: ~/.oh-my-zsh/custom/plugins
+macinit_vim_colors_dir: ~/.vim/pack/colors
+macinit_vim_plugins_dir: ~/.vim/pack/plugins
+macinit_omz_plugins_dir: ~/.oh-my-zsh/custom/plugins
 
-vim_plugins:
+macinit_vim_plugins:
   - name: nerdtree
     url: https://github.com/preservim/nerdtree
+    version: master
   - name: fzf-vim
     url: https://github.com/junegunn/fzf.vim
+    version: master
   - name: vim-fugitive
     url: https://github.com/tpope/vim-fugitive
+    version: master
   - name: vim-markdown
     url: https://github.com/preservim/vim-markdown
+    version: master
   - name: vim-terraform
     url: https://github.com/hashivim/vim-terraform
+    version: master
 
-vim_color_schemes:
+macinit_vim_color_schemes:
   - name: vim-wombat-scheme
     url: https://github.com/sheerun/vim-wombat-scheme
+    version: master
   - name: gruvbox
     url: https://github.com/morhetz/gruvbox
+    version: master
 
-tmux_repo: https://github.com/gpakosz/.tmux.git
+macinit_tmux_repo: https://github.com/gpakosz/.tmux.git
+macinit_tmux_repo_version: master
 
-zsh_plugins:
+macinit_zsh_plugins:
   - name: zsh-autosuggestions
     url: https://github.com/zsh-users/zsh-autosuggestions
+    version: master
   - name: autoupdate
     url: https://github.com/TamCore/autoupdate-oh-my-zsh-plugins
+    version: master
