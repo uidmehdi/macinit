@@ -4,13 +4,13 @@
   roles:
     - role: macinit
       vars:
-        do_customize: false
-        homebrew:
+        macinit_do_customize: false
+        macinit_homebrew:
           - git
           - curl
           - jq
           - bat
           - uv
-        homebrew_cask: []
-        uv_tools:
+        macinit_homebrew_cask: []
+        macinit_uv_tools:
           - az-account-switcher

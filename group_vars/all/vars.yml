@@ -1,13 +1,14 @@
 ---
-do_customize: false
+macinit_do_customize: false
 
-homebrew_tap:
+macinit_homebrew_tap:
   - Azure/kubelogin
   - aquasecurity/trivy
   - fluxcd/tap
   - warrensbox/tap
+  - terraform-linters/tap
 
-homebrew:
+macinit_homebrew:
   - age
   - ansible
   - ansible-lint
@@ -26,6 +27,7 @@ homebrew:
   - ffmpeg
   - fluxcd/tap/flux
   - fzf
+  - gh
   - gist
   - git
   - git-filter-repo
@@ -49,6 +51,7 @@ homebrew:
   - kustomize
   - lazygit
   - libpq
+  - mise
   - powerlevel10k
   - pre-commit
   - rclone
@@ -61,8 +64,8 @@ homebrew:
   - stern
   - syft
   - terraform-docs
+  - terraform-linters/tap/tflint
   - terraform-ls
-  - tflint
   - tmux
   - tree
   - aquasecurity/trivy/trivy
@@ -77,7 +80,7 @@ homebrew:
   - zsh-completions
   - zsh-syntax-highlighting
 
-homebrew_cask:
+macinit_homebrew_cask:
   - alt-tab
   - anki
   - antigravity
@@ -88,6 +91,7 @@ homebrew_cask:
   - bruno
   - claude-code
   - codex
+  - copilot-cli
   - dbeaver-community
   - docker-desktop
   - drawio
@@ -124,5 +128,5 @@ homebrew_cask:
   - vlc
   - whatsapp
 
-uv_tools:
+macinit_uv_tools:
   - az-account-switcher

@@ -2,8 +2,8 @@
 - name: Check zsh completion directories
   ansible.builtin.stat:
     path: "{{ item }}"
-  loop: "{{ zsh_compinit_permission_dirs }}"
-  register: zsh_completion_dirs
+  loop: "{{ macinit_zsh_compinit_permission_dirs }}"
+  register: macinit_zsh_completion_dirs
   tags: [zsh, dotfiles]
 
 - name: Remove group/world write permissions from zsh completion directories
@@ -11,13 +11,13 @@
     path: "{{ item.stat.path }}"
     mode: "go-w"
     recurse: true
-  loop: "{{ zsh_completion_dirs.results }}"
+  loop: "{{ macinit_zsh_completion_dirs.results }}"
   when: item.stat.exists
   tags: [zsh, dotfiles]
 
 - name: Audit zsh compinit insecure paths
   ansible.builtin.command: /bin/zsh -fc 'autoload -Uz compaudit; compaudit'
-  register: zsh_compaudit
+  register: macinit_zsh_compaudit
   changed_when: false
   failed_when: false
   tags: [zsh, dotfiles]
@@ -27,7 +27,7 @@
     path: "{{ item }}"
     mode: "go-w"
     recurse: true
-  loop: "{{ zsh_compaudit.stdout_lines }}"
+  loop: "{{ macinit_zsh_compaudit.stdout_lines }}"
   when: item | length > 0
   tags: [zsh, dotfiles]
 
@@ -37,12 +37,12 @@
     patterns: ".zcompdump*"
     hidden: true
     file_type: file
-  register: zsh_compdump_files
+  register: macinit_zsh_compdump_files
   tags: [zsh, dotfiles]
 
 - name: Remove stale zsh completion caches
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
-  loop: "{{ zsh_compdump_files.files }}"
+  loop: "{{ macinit_zsh_compdump_files.files }}"
   tags: [zsh, dotfiles]

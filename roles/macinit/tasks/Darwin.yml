@@ -9,12 +9,12 @@
 
 - name: Copy dotfiles and clone Git repos
   ansible.builtin.include_tasks: dotfiles.yml
-  when: do_customize | bool
+  when: macinit_do_customize | bool
   tags: [dotfiles]
 
 - name: Fix zsh completion permissions
   ansible.builtin.include_tasks: zsh.yml
-  when: zsh_fix_compinit_permissions | bool
+  when: macinit_zsh_fix_compinit_permissions | bool
   tags: [zsh, dotfiles]
 
 - name: Run cleanup

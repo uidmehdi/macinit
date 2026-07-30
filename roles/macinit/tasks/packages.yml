@@ -6,12 +6,25 @@
 
 - name: Add Homebrew taps
   community.general.homebrew_tap:
-    name: "{{ homebrew_tap }}"
+    name: "{{ macinit_homebrew_tap }}"
     state: present
-  when: homebrew_tap | length > 0
+  when: macinit_homebrew_tap | length > 0
+  tags: [packages, brew]
+
+- name: Trust third-party Homebrew taps
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew trust {{ item }}"
+  register: macinit_brew_trust_result
+  changed_when: "'now trusted' in (macinit_brew_trust_result.stdout | lower)"
+  failed_when: >-
+    macinit_brew_trust_result.rc != 0 and
+    'already trusted' not in (macinit_brew_trust_result.stderr | lower)
+  loop: "{{ macinit_homebrew_tap }}"
+  when: macinit_homebrew_tap | length > 0
   tags: [packages, brew]
 
 - name: Install Homebrew formulae
+  when: macinit_homebrew | length > 0
+  tags: [packages, brew]
   block:
     - name: Install formula
       community.general.homebrew:
@@ -19,25 +32,24 @@
         state: present
         install_options: "{{ item.install_options | default(omit) }}"
         update_homebrew: false
-      loop: "{{ homebrew }}"
+      loop: "{{ macinit_homebrew }}"
   rescue:
     - name: Warn on failed formulae installs
       ansible.builtin.debug:
         msg: "Formula install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
-  when: homebrew | length > 0
-  tags: [packages, brew]
 
 - name: Resolve desired package names
   ansible.builtin.set_fact:
-    desired_formulae: "{{ (homebrew | selectattr('name', 'defined') | map(attribute='name') | map('lower') | list)
-                        + (homebrew | select('string') | map('lower') | list) }}"
-    desired_casks: "{{ (homebrew_cask | selectattr('name', 'defined') | map(attribute='name') | map('regex_replace', '^.*/', '') | map('lower') | list)
-                     + (homebrew_cask | select('string') | map('regex_replace', '^.*/', '') | map('lower') | list) }}"
+    macinit_desired_formulae: "{{ (macinit_homebrew | selectattr('name', 'defined') | map(attribute='name') | map('lower') | list)
+                        + (macinit_homebrew | select('string') | map('lower') | list) }}"
+    macinit_desired_casks: "{{ (macinit_homebrew_cask | selectattr('name', 'defined') | map(attribute='name')
+                     | map('regex_replace', '^.*/', '') | map('lower') | list)
+                     + (macinit_homebrew_cask | select('string') | map('regex_replace', '^.*/', '') | map('lower') | list) }}"
   tags: [packages, brew, cask]
 
 - name: Get explicitly installed Homebrew formulae
-  ansible.builtin.command: "{{ brew_bin_path }}/brew list --formula --full-name --installed-on-request"
-  register: brew_formulae_installed
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew list --formula --full-name --installed-on-request"
+  register: macinit_brew_formulae_installed
   changed_when: false
   check_mode: false
   tags: [packages, brew]
@@ -46,60 +58,80 @@
   community.general.homebrew:
     name: "{{ item }}"
     state: absent
-  register: brew_formula_remove_result
+  register: macinit_brew_formula_remove_result
   failed_when: >-
-    brew_formula_remove_result is failed and
-    'Refusing to uninstall' not in (brew_formula_remove_result.msg | default(''))
-  loop: "{{ brew_formulae_installed.stdout_lines }}"
-  when: homebrew_prune_enabled | bool and homebrew | length > 0 and item | lower not in desired_formulae
+    macinit_brew_formula_remove_result is failed and
+    'Refusing to uninstall' not in (macinit_brew_formula_remove_result.msg | default(''))
+  loop: "{{ macinit_brew_formulae_installed.stdout_lines }}"
+  when: macinit_homebrew_prune_enabled | bool and macinit_homebrew | length > 0 and item | lower not in macinit_desired_formulae
   tags: [packages, brew]
 
 - name: Upgrade all Homebrew formulae
-  ansible.builtin.command: "{{ brew_bin_path }}/brew upgrade"
-  register: brew_upgrade
-  changed_when: brew_upgrade.stdout | length > 0
-  when: homebrew_upgrade_all | default(true)
+  when: macinit_homebrew_upgrade_all | default(true)
   tags: [packages, brew]
+  block:
+    - name: Get outdated Homebrew formulae
+      ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew outdated --formula --quiet"
+      register: macinit_brew_outdated_formulae
+      changed_when: false
+      check_mode: false
+
+    - name: Upgrade outdated Homebrew formulae
+      vars:
+        # Exclude ansible/ansible-lint: upgrading the formula that is currently
+        # running this playbook corrupts the controller's module communication
+        # mid-run (deserialization failures). Upgrade these manually instead.
+        macinit_formulae_to_upgrade: "{{ macinit_brew_outdated_formulae.stdout_lines | difference(['ansible', 'ansible-lint']) }}"
+      ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew upgrade --formula {{ macinit_formulae_to_upgrade | join(' ') }}"
+      register: macinit_brew_upgrade
+      changed_when: macinit_brew_upgrade.stdout is defined and macinit_brew_upgrade.stdout | length > 0
+      when: macinit_formulae_to_upgrade | length > 0
+  rescue:
+    - name: Warn on failed formulae upgrade
+      ansible.builtin.debug:
+        msg: "Formula upgrade failed: {{ ansible_failed_result.msg | default('unknown error') }}"
 
 - name: Manage Homebrew casks
+  tags: [packages, cask]
   block:
     - name: Temporarily allow passwordless sudo for Homebrew cask installers
       ansible.builtin.copy:
         content: "{{ ansible_facts['user_id'] }}  ALL = (ALL) NOPASSWD: ALL\n"
-        dest: "{{ homebrew_cask_temporary_sudoers_path }}"
+        dest: "{{ macinit_homebrew_cask_temporary_sudoers_path }}"
         owner: root
         group: wheel
         mode: "0440"
         validate: /usr/sbin/visudo -cf %s
       become: true
       when:
-        - homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
 
     - name: Warm sudo credentials for Homebrew cask installers
       ansible.builtin.command: /usr/bin/true
       become: true
       changed_when: false
       when:
-        - homebrew_cask_sudo_keepalive | default(true) | bool
-        - not homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_sudo_keepalive | default(true) | bool
+        - not macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
 
     - name: Keep sudo credentials warm during Homebrew cask operations
       ansible.builtin.shell:
         cmd: >-
           while /usr/bin/sudo -n -v; do
-          /bin/sleep {{ homebrew_cask_sudo_keepalive_interval | default(60) | int }};
+          /bin/sleep {{ macinit_homebrew_cask_sudo_keepalive_interval | default(60) | int }};
           done & echo $!
         executable: /bin/bash
-      register: homebrew_cask_sudo_keepalive_pid
+      register: macinit_homebrew_cask_sudo_keepalive_pid
       changed_when: false
       when:
-        - homebrew_cask_sudo_keepalive | default(true) | bool
-        - not homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - homebrew_cask | length > 0 or homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_sudo_keepalive | default(true) | bool
+        - not macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
 
     - name: Install Homebrew cask packages
+      when: macinit_homebrew_cask | length > 0
       block:
         - name: Install cask
           community.general.homebrew_cask:
@@ -107,16 +139,15 @@
             state: present
             install_options: "{{ item.install_options | default(omit) }}"
             update_homebrew: false
-          loop: "{{ homebrew_cask }}"
+          loop: "{{ macinit_homebrew_cask }}"
       rescue:
         - name: Warn on failed cask installs
           ansible.builtin.debug:
             msg: "Cask install failed: {{ ansible_failed_result.msg | default('unknown error') }}"
-      when: homebrew_cask | length > 0
 
     - name: Get installed Homebrew casks
-      ansible.builtin.command: "{{ brew_bin_path }}/brew list --cask"
-      register: brew_casks_installed
+      ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew list --cask"
+      register: macinit_brew_casks_installed
       changed_when: false
       check_mode: false
 
@@ -124,15 +155,15 @@
       community.general.homebrew_cask:
         name: "{{ item }}"
         state: absent
-      loop: "{{ brew_casks_installed.stdout_lines }}"
-      when: homebrew_prune_enabled | bool and homebrew_cask | length > 0 and item | lower not in desired_casks
+      loop: "{{ macinit_brew_casks_installed.stdout_lines }}"
+      when: macinit_homebrew_prune_enabled | bool and macinit_homebrew_cask | length > 0 and item | lower not in macinit_desired_casks
 
     - name: Upgrade all Homebrew casks
+      when: macinit_homebrew_upgrade_all | default(true)
       block:
         - name: Upgrade casks
           community.general.homebrew_cask:
             upgrade_all: true
-      when: homebrew_upgrade_all | default(true)
       rescue:
         - name: Warn on failed cask upgrades
           ansible.builtin.debug:
@@ -141,28 +172,51 @@
               Casks requiring sudo (e.g. docker-desktop) may need manual: brew upgrade --cask
   always:
     - name: Stop sudo keepalive for Homebrew cask installers
-      ansible.builtin.command: "/bin/kill {{ homebrew_cask_sudo_keepalive_pid.stdout }}"
+      ansible.builtin.command: "/bin/kill {{ macinit_homebrew_cask_sudo_keepalive_pid.stdout }}"
       changed_when: false
       failed_when: false
       when:
-        - homebrew_cask_sudo_keepalive_pid is defined
-        - homebrew_cask_sudo_keepalive_pid.stdout is defined
-        - homebrew_cask_sudo_keepalive_pid.stdout | length > 0
+        - macinit_homebrew_cask_sudo_keepalive_pid is defined
+        - macinit_homebrew_cask_sudo_keepalive_pid.stdout is defined
+        - macinit_homebrew_cask_sudo_keepalive_pid.stdout | length > 0
 
     - name: Remove temporary passwordless sudo for Homebrew cask installers
       ansible.builtin.file:
-        path: "{{ homebrew_cask_temporary_sudoers_path }}"
+        path: "{{ macinit_homebrew_cask_temporary_sudoers_path }}"
         state: absent
       become: true
-      when: homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-  tags: [packages, cask]
+      when: macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+
+- name: Get installed Homebrew taps
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew tap"
+  register: macinit_brew_taps_installed
+  changed_when: false
+  check_mode: false
+  when: macinit_homebrew_prune_enabled | bool
+  tags: [packages, brew]
+
+- name: Remove taps not in desired list
+  community.general.homebrew_tap:
+    name: "{{ item }}"
+    state: absent
+  register: macinit_brew_tap_remove_result
+  failed_when: >-
+    macinit_brew_tap_remove_result is failed and
+    'is not allowed' not in (macinit_brew_tap_remove_result.msg | default('')) and
+    'Refusing to untap' not in (macinit_brew_tap_remove_result.msg | default(''))
+  loop: "{{ macinit_brew_taps_installed.stdout_lines | default([]) }}"
+  when:
+    - macinit_homebrew_prune_enabled | bool
+    - item | lower not in (macinit_homebrew_tap | map('lower') | list)
+    - item | lower not in (macinit_homebrew_protected_taps | map('lower') | list)
+  tags: [packages, brew]
 
 - name: Install or upgrade Python tools via uv
-  ansible.builtin.command: "{{ brew_bin_path }}/uv tool install --upgrade {{ item }}"
-  loop: "{{ uv_tools }}"
-  register: uv_tool_result
+  ansible.builtin.command: "{{ macinit_brew_bin_path }}/uv tool install --upgrade {{ item }}"
+  loop: "{{ macinit_uv_tools }}"
+  register: macinit_uv_tool_result
   changed_when: >-
-    'Installed' in uv_tool_result.stdout or
-    'Updated' in uv_tool_result.stdout
-  when: uv_tools | length > 0
+    'Installed' in macinit_uv_tool_result.stdout or
+    'Updated' in macinit_uv_tool_result.stdout
+  when: macinit_uv_tools | length > 0
   tags: [packages, uv]

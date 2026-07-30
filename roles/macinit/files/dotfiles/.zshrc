@@ -13,6 +13,9 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 export HOMEBREW_CASK_OPTS='--no-quarantine'
+export HOMEBREW_NO_REQUIRE_TAP_TRUST=1
+export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
+export HOMEBREW_NO_ASK=1
 
 # ──────────────────────────────────────────────────────────────────────────────
 # PATH (consolidated & Homebrew-first)
@@ -57,6 +60,7 @@ plugins=(
   docker
   nvm
   autoupdate
+  mise
 )
 
 command -v brew >/dev/null && plugins+=(brew)
@@ -71,6 +75,10 @@ if command -v brew >/dev/null; then
   [[ -d "$brew_zsh_completions" ]] && fpath=("$brew_zsh_completions" $fpath)
   unset brew_zsh_completions
 fi
+
+# The role repairs completion permissions; avoid Oh My Zsh's interactive prompt
+# if a stale cache or environment-specific path still trips compfix.
+export ZSH_DISABLE_COMPFIX=true
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Load Oh My Zsh *before* heavy customizations
@@ -126,6 +134,9 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# psql
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
 # Flux completion (only if installed)
 command -v flux >/dev/null && . <(flux completion zsh)
 
@@ -158,10 +169,22 @@ if [[ -r "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting
   source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
+# Custom functions
+copycmd() {
+  echo "\$ $*" | cat - <(eval "$@") | pbcopy
+}
+
+# SOPS AGE
+export SOPS_AGE_KEY_FILE=$HOME/.sec/keys.txt
+
 # Custom aliases last
 source ~/.aliases
 
 # Local overrides last (e.g., CIDR variable for ssh completion)
 CIDR="10.110.0.0/16 10.100.0.0/16 10.200.0.0/16"
 
-#eval "$(direnv hook zsh)"
+# Added by Antigravity
+export PATH="/Users/mehdi/.antigravity/antigravity/bin:$PATH"
+
+# direnv hook
+eval "$(direnv hook zsh)"

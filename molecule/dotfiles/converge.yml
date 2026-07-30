@@ -4,7 +4,7 @@
   roles:
     - role: macinit
       vars:
-        do_customize: true
-        homebrew: []
-        homebrew_cask: []
-        uv_tools: []
+        macinit_do_customize: true
+        macinit_homebrew: []
+        macinit_homebrew_cask: []
+        macinit_uv_tools: []

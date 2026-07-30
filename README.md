@@ -53,7 +53,7 @@ ansible-playbook playbook.yml -K
 Run with dotfile deployment (existing files are backed up in-place):
 
 ```bash
-ansible-playbook playbook.yml -K -e "do_customize=true"
+ansible-playbook playbook.yml -K -e "macinit_do_customize=true"
 ```
 
 > This also configures passwordless sudo for your user (`/etc/sudoers.d/<user>`). Subsequent runs do not need `-K`.
@@ -64,15 +64,16 @@ Edit [group_vars/all/vars.yml](group_vars/all/vars.yml) to manage package lists:
 
 | Variable | Description |
 |---|---|
-| `homebrew_tap` | Homebrew taps to add |
-| `homebrew` | Homebrew formulae to install (packages not in this list are removed). Use fully qualified names like `fluxcd/tap/flux` when a tapped formula conflicts with a core formula. |
-| `homebrew_prune_enabled` | Remove packages not listed in `homebrew`/`homebrew_cask` (formulae and casks). Default is CI-aware: enabled in CI (`CI=true`), disabled for local runs unless explicitly set to `true`. |
-| `homebrew_cask` | Homebrew casks to install (casks not in this list are removed) |
-| `uv_tools` | Python CLI tools to install via `uv tool install --upgrade` |
-| `homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |
-| `homebrew_cask_sudo_keepalive` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts (default: `true`). |
-| `homebrew_cask_temporary_passwordless_sudo` | Temporarily create a sudoers drop-in for the cask phase only, then remove it. Use this if keepalive is not enough for long or stubborn cask installers (default: `false`). |
-| `zsh_fix_compinit_permissions` | Remove group/world write permissions from zsh completion directories and clear `.zcompdump` to avoid `compinit: insecure directories` warnings (default: `true`). |
+| `macinit_homebrew_tap` | Homebrew taps to add |
+| `macinit_homebrew` | Homebrew formulae to install (packages not in this list are removed). Use fully qualified names like `fluxcd/tap/flux` when a tapped formula conflicts with a core formula. |
+| `macinit_homebrew_prune_enabled` | Remove packages not listed in `macinit_homebrew`/`macinit_homebrew_cask` (formulae and casks) and untap taps not listed in `macinit_homebrew_tap`. Default is CI-aware: enabled in CI (`CI=true`), disabled for local runs unless explicitly set to `true`. |
+| `macinit_homebrew_protected_taps` | Taps that are never removed during pruning (default: Homebrew's own `homebrew/core`, `homebrew/cask`, `homebrew/bundle`, `homebrew/services`). |
+| `macinit_homebrew_cask` | Homebrew casks to install (casks not in this list are removed) |
+| `macinit_uv_tools` | Python CLI tools to install via `uv tool install --upgrade` |
+| `macinit_homebrew_upgrade_all` | Upgrade all formulae and casks on each run (default: `true`). Set to `false` to skip upgrades. |
+| `macinit_homebrew_cask_sudo_keepalive` | Keep the sudo timestamp warm during cask operations to avoid repeated installer prompts (default: `true`). |
+| `macinit_homebrew_cask_temporary_passwordless_sudo` | Temporarily create a sudoers drop-in for the cask phase only, then remove it. Use this if keepalive is not enough for long or stubborn cask installers (default: `false`). |
+| `macinit_zsh_fix_compinit_permissions` | Remove group/world write permissions from zsh completion directories and clear `.zcompdump` to avoid `compinit: insecure directories` warnings (default: `true`). |
 
 ## Project structure
 
