@@ -1,7 +1,7 @@
 ---
 - name: Check if Homebrew is already installed
   ansible.builtin.stat:
-    path: /opt/homebrew/bin/brew
+    path: "{{ macinit_brew_bin_path }}/brew"
   register: macinit_brew_bin
   check_mode: false
   tags: [brew]
@@ -32,19 +32,19 @@
     HOME: "{{ ansible_env.HOME }}"
     USER: "{{ ansible_facts['user_id'] }}"
   when: not macinit_brew_bin.stat.exists
-  changed_when: not macinit_brew_bin.stat.exists
+  changed_when: true
   tags: [brew]
 
 - name: Verify Homebrew binary exists after install
   ansible.builtin.stat:
-    path: /opt/homebrew/bin/brew
+    path: "{{ macinit_brew_bin_path }}/brew"
   register: macinit_brew_bin_post
   when: not macinit_brew_bin.stat.exists
   tags: [brew]
 
 - name: Fail if Homebrew binary is missing after install
   ansible.builtin.fail:
-    msg: "Homebrew installation appeared to succeed but /opt/homebrew/bin/brew was not found."
+    msg: "Homebrew installation appeared to succeed but {{ macinit_brew_bin_path }}/brew was not found."
   when:
     - not macinit_brew_bin.stat.exists
     - not macinit_brew_bin_post.stat.exists

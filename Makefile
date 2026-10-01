@@ -11,7 +11,7 @@ help: ## Show this help
 install-deps: ## Install test dependencies via uv
 	uv tool install ansible-lint
 	uv tool install yamllint
-	pip install molecule
+	uv tool install molecule --with ansible-core
 	ansible-galaxy collection install -r requirements.yml
 
 lint: ## Run yamllint and ansible-lint

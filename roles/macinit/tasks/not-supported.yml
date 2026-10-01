@@ -1,5 +1,0 @@
----
-- name: Warn on unsupported platform
-  ansible.builtin.fail:
-    msg: |
-      This role does not support '{{ ansible_facts['os_family'] }}' platform.
