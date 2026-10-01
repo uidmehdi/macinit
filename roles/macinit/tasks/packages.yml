@@ -67,7 +67,7 @@
   tags: [packages, brew]
 
 - name: Upgrade all Homebrew formulae
-  when: macinit_homebrew_upgrade_all | default(true)
+  when: macinit_homebrew_upgrade_all | bool
   tags: [packages, brew]
   block:
     - name: Get outdated Homebrew formulae
@@ -84,7 +84,7 @@
         macinit_formulae_to_upgrade: "{{ macinit_brew_outdated_formulae.stdout_lines | difference(['ansible', 'ansible-lint']) }}"
       ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew upgrade --formula {{ macinit_formulae_to_upgrade | join(' ') }}"
       register: macinit_brew_upgrade
-      changed_when: macinit_brew_upgrade.stdout is defined and macinit_brew_upgrade.stdout | length > 0
+      changed_when: "'==> Upgrading' in macinit_brew_upgrade.stdout"
       when: macinit_formulae_to_upgrade | length > 0
   rescue:
     - name: Warn on failed formulae upgrade
@@ -104,31 +104,31 @@
         validate: /usr/sbin/visudo -cf %s
       become: true
       when:
-        - macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_temporary_passwordless_sudo | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | bool
 
     - name: Warm sudo credentials for Homebrew cask installers
       ansible.builtin.command: /usr/bin/true
       become: true
       changed_when: false
       when:
-        - macinit_homebrew_cask_sudo_keepalive | default(true) | bool
-        - not macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_sudo_keepalive | bool
+        - not macinit_homebrew_cask_temporary_passwordless_sudo | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | bool
 
     - name: Keep sudo credentials warm during Homebrew cask operations
       ansible.builtin.shell:
         cmd: >-
           while /usr/bin/sudo -n -v; do
-          /bin/sleep {{ macinit_homebrew_cask_sudo_keepalive_interval | default(60) | int }};
-          done & echo $!
+          /bin/sleep {{ macinit_homebrew_cask_sudo_keepalive_interval | int }};
+          done >/dev/null 2>&1 & echo $!
         executable: /bin/bash
       register: macinit_homebrew_cask_sudo_keepalive_pid
       changed_when: false
       when:
-        - macinit_homebrew_cask_sudo_keepalive | default(true) | bool
-        - not macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
-        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | default(true) | bool
+        - macinit_homebrew_cask_sudo_keepalive | bool
+        - not macinit_homebrew_cask_temporary_passwordless_sudo | bool
+        - macinit_homebrew_cask | length > 0 or macinit_homebrew_upgrade_all | bool
 
     - name: Install Homebrew cask packages
       when: macinit_homebrew_cask | length > 0
@@ -159,7 +159,7 @@
       when: macinit_homebrew_prune_enabled | bool and macinit_homebrew_cask | length > 0 and item | lower not in macinit_desired_casks
 
     - name: Upgrade all Homebrew casks
-      when: macinit_homebrew_upgrade_all | default(true)
+      when: macinit_homebrew_upgrade_all | bool
       block:
         - name: Upgrade casks
           community.general.homebrew_cask:
@@ -185,7 +185,7 @@
         path: "{{ macinit_homebrew_cask_temporary_sudoers_path }}"
         state: absent
       become: true
-      when: macinit_homebrew_cask_temporary_passwordless_sudo | default(false) | bool
+      when: macinit_homebrew_cask_temporary_passwordless_sudo | bool
 
 - name: Get installed Homebrew taps
   ansible.builtin.command: "{{ macinit_brew_bin_path }}/brew tap"

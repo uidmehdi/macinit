@@ -4,6 +4,7 @@ macinit_brew_bin_path: "{{ macinit_brew_prefix }}/bin"
 macinit_homebrew_tap: []
 macinit_homebrew: []
 macinit_homebrew_cask: []
+macinit_homebrew_upgrade_all: true
 macinit_homebrew_prune_enabled: "{{ lookup('env', 'CI') | default('false', true) | bool }}"
 macinit_homebrew_protected_taps:
   - homebrew/core
